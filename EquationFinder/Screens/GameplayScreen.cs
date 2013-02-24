@@ -60,7 +60,7 @@ namespace EquationFinder.Screens
 
         #region Initialization
 
-        public GameplayScreen(int boardSize, BigInteger gameHash, int target)
+        public GameplayScreen(BigInteger gameHash, int target)
         {
 
             //setup the transitions
@@ -68,7 +68,7 @@ namespace EquationFinder.Screens
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
 
             //set the global variables
-            this._boardSize = boardSize;
+            this._boardSize = GameplayOptions.BoardSize;
             this._currentX = 0;
             this._currentY = 0;
             _selectedX = -1;
@@ -76,8 +76,8 @@ namespace EquationFinder.Screens
             _target = target;
 
             //get a board
-            this._gameBoard = new BoardItem[boardSize, boardSize];
-            this._gameBoardValues = BoardLogic.CreateBoard(boardSize, gameHash);
+            this._gameBoard = new BoardItem[GameplayOptions.BoardSize, GameplayOptions.BoardSize];
+            this._gameBoardValues = BoardLogic.CreateBoard(GameplayOptions.BoardSize, gameHash);
 
             this._currentEquation = "";
             this._selectedYXs.Clear();
@@ -88,7 +88,7 @@ namespace EquationFinder.Screens
 
         }
 
-        public GameplayScreen(int boardSize, int target)
+        public GameplayScreen(int target)
         {
 
             //setup the transitions
@@ -96,7 +96,7 @@ namespace EquationFinder.Screens
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
 
             //set the global variables
-            this._boardSize = boardSize;
+            this._boardSize = GameplayOptions.BoardSize;
             this._currentX = 0;
             this._currentY = 0;
             _selectedX = -1;
@@ -104,8 +104,8 @@ namespace EquationFinder.Screens
             _target = target;
 
             //get a board
-            this._gameBoard = new BoardItem[boardSize, boardSize];
-            this._gameBoardValues = BoardLogic.CreateBoard(boardSize);
+            this._gameBoard = new BoardItem[GameplayOptions.BoardSize, GameplayOptions.BoardSize];
+            this._gameBoardValues = BoardLogic.CreateBoard(GameplayOptions.BoardSize);
 
             this._currentEquation = "";
             this._selectedYXs.Clear();
@@ -156,76 +156,87 @@ namespace EquationFinder.Screens
 
             ScreenManager.GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // Our player and enemy are both actually just text strings.
-            SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
-
-            // Start drawing
-            spriteBatch.Begin();
-
-            //draw the background
-            spriteBatch.Draw(_texture, 
-                new Rectangle(
-                    ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X,
-                    ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y,
-                    ScreenManager.GraphicsDevice.Viewport.Width,
-                    ScreenManager.GraphicsDevice.Viewport.Height), Color.White);
-
-            // Draw the score
-            spriteBatch.DrawString(_gameFont, "Target: " + _target, new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y), Color.Black);
-            spriteBatch.DrawString(_gameFont, "Equation: " + _currentEquation, new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y + 30), Color.Black);
-            spriteBatch.DrawString(_gameFont, "Score: " + this._score.ToString(), new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y + 60), Color.Black);
-            
-            Vector2 timeSize = _gameFont.MeasureString("Time:   " + _clock.displayClock);
-            spriteBatch.DrawString(_gameFont, "Time: " + _clock.displayClock, new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Width - 130,
-                ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y), Color.Black);
-           
-
-            int row = 0, col = 0;
-            while (row < this._boardSize)
+            //if the board is initialized
+            if (this._isBoardInitialized)
             {
-                while (col < this._boardSize)
+
+                // Our player and enemy are both actually just text strings.
+                SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
+
+                // Start drawing
+                spriteBatch.Begin();
+
+                //draw the background
+                spriteBatch.Draw(_texture,
+                    new Rectangle(
+                        ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X,
+                        ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y,
+                        ScreenManager.GraphicsDevice.Viewport.Width,
+                        ScreenManager.GraphicsDevice.Viewport.Height), Color.White);
+
+                // Draw the score
+                spriteBatch.DrawString(_gameFont, "Target: " + _target, new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y), Color.Black);
+                spriteBatch.DrawString(_gameFont, "Equation: " + _currentEquation, new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y + 30), Color.Black);
+                spriteBatch.DrawString(_gameFont, "Score: " + string.Format("{0:n0}", this._score), new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y + 60), Color.Black);
+
+                //get the time string
+                var time = "Time:   " + _clock.displayClock;
+                if (_clock.displayClock == "Game Over")
+                    time = "Game Over";
+
+                //draw the space need for the time string
+                Vector2 timeSize = _gameFont.MeasureString(time);
+                spriteBatch.DrawString(_gameFont, time, new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Width - timeSize.X - 10,
+                    ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y), Color.Black);
+
+                int row = 0, col = 0;
+                while (row < this._boardSize)
                 {
+                    while (col < this._boardSize)
+                    {
 
-                    //get whether the current item is selected or not
-                    bool isSelected = IsActive && (row == this._currentY) && (col == this._currentX);
+                        //get whether the current item is selected or not
+                        bool isSelected = IsActive && (row == this._currentY) && (col == this._currentX);
 
-                    //get whether the current item is selected or not
-                    bool isPreviouslySelected = _selectedYXs
-                        .FirstOrDefault(x => x == string.Format("{0},{1}", row, col)) != null;
+                        //get whether the current item is selected or not
+                        bool isPreviouslySelected = _selectedYXs
+                            .FirstOrDefault(x => x == string.Format("{0},{1}", row, col)) != null;
 
-                    //show the item
-                    this._gameBoard[row, col].Draw(this, isSelected, isPreviouslySelected, gameTime);
+                        //show the item
+                        this._gameBoard[row, col].Draw(this, isSelected, isPreviouslySelected, gameTime);
 
-                    //go to the next column
-                    col++;
+                        //go to the next column
+                        col++;
+
+                    }
+
+                    //go to the next row
+                    row++;
+                    col = 0;
 
                 }
 
-                //go to the next row
-                row++;
-                col = 0;
+                //if we have flash text, draw the string
+                if (_flashText.Active)
+                {
+
+                    //calculate where the flash text goes
+                    Vector2 textSize = _gameFont.MeasureString(_flashText.Text);
+                    Vector2 textCenter = new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, 50f);
+
+                    //draw the flash text
+                    spriteBatch.DrawString(
+                        _gameFont,
+                        _flashText.Text,
+                        textCenter - (textSize / 2),
+                        Color.DarkBlue);
+
+                }
+
+                // Stop drawing
+                spriteBatch.End();
 
             }
-
-            //if we have flash text, draw the string
-            if (_flashText.Active)
-            {
-
-                //calculate where the flash text goes
-                Vector2 textSize = _gameFont.MeasureString(_flashText.Text);
-                Vector2 textCenter = new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, 50f);
-
-                //draw the flash text
-                spriteBatch.DrawString(
-                    _gameFont,
-                    _flashText.Text,
-                    textCenter - (textSize / 2),
-                    Color.DarkBlue);
-
-            }
-
-            // Stop drawing
-            spriteBatch.End();
 
         }
 
@@ -238,7 +249,10 @@ namespace EquationFinder.Screens
 
                 //update the board items
                 if (!this._isBoardInitialized)
+                {
                     UpdateBoardItems();
+                    this._isBoardInitialized = true;
+                }
 
                 //count 60 seconds down 
                 _clock.Start(60);
@@ -544,11 +558,17 @@ namespace EquationFinder.Screens
         private void PlaySound(SoundEffect soundEffect, GameTime gameTime)
         {
 
-            //we don't want to play sounds to close together
-            if (gameTime.TotalGameTime.TotalMilliseconds - _lastPlayedSound >= 500)
+            //if we want to play sound effects
+            if (GameplayOptions.PlaySoundEffects)
             {
-            soundEffect.Play();
-                _lastPlayedSound = gameTime.TotalGameTime.TotalMilliseconds;
+
+                //we don't want to play sounds to close together
+                if (gameTime.TotalGameTime.TotalMilliseconds - _lastPlayedSound >= 500)
+                {
+                    soundEffect.Play();
+                    _lastPlayedSound = gameTime.TotalGameTime.TotalMilliseconds;
+                }
+
             }
 
         }

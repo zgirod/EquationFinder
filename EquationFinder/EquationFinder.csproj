@@ -90,7 +90,12 @@
     <Compile Include="ScreenManager\ScreenManager.cs" />
     <Compile Include="Screens\BoardItem.cs" />
     <Compile Include="Screens\FlashText.cs" />
+    <Compile Include="Screens\GameplayOptions.cs" />
     <Compile Include="Screens\GameplayScreen.cs" />
+    <Compile Include="Screens\LoadingScreen.cs" />
+    <Compile Include="Screens\MainMenuScreen.cs" />
+    <Compile Include="Screens\MenuEntry.cs" />
+    <Compile Include="Screens\MenuScreen.cs" />
     <Compile Include="Screens\PlayerIndexEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -46,7 +46,9 @@ namespace EquationFinder
             Components.Add(screenManager);
 
             // Activate the first screens.
-            screenManager.AddScreen(new GameplayScreen(5, 19), null);
+            GameplayOptions.BoardSize = 5;
+            GameplayOptions.PlaySoundEffects = true;
+            screenManager.AddScreen(new MainMenuScreen(), null);
 
             base.Initialize();
         }
