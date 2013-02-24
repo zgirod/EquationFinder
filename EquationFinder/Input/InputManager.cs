@@ -58,7 +58,7 @@ namespace EquationFinder.Input
                 { Buttons.Back, Keys.Delete },
                 { Buttons.LeftTrigger, Keys.Enter },
                 { Buttons.RightTrigger, Keys.Space },
-                { Buttons.Start, Keys.S },
+                { Buttons.Start, Keys.T },
                 { Buttons.LeftShoulder, Keys.Q },
                 { Buttons.RightShoulder, Keys.W }
             };

@@ -15,6 +15,15 @@ using EquationFinder.DomainLogic;
 
 namespace EquationFinder.Screens
 {
+
+    public enum ActionType
+    {
+        NUMBER,
+        OPERATOR,
+        LEFT_PARENTHESIS,
+        RIGHT_PARENTHESIS
+    }
+
     public class GameplayScreen : GameScreen
     {
 
@@ -25,17 +34,23 @@ namespace EquationFinder.Screens
         int _currentX, _currentY;
         int _selectedX, _selectedY;
         int _target;
+        int _score;
+        int _totalCorrect;
+        int _roundCorrect;
+        FlashText _flashText = new FlashText();
         int[,] _gameBoardValues;
         BoardItem[,] _gameBoard;
         string _currentEquation;
+        bool _isBoardInitialized;
         List<string> _undoEquations = new List<string>();
         List<string> _undoType = new List<string>();
         List<string> _selectedYXs = new List<string>();
+        List<ActionType> _selectedActionTypes = new List<ActionType>();
         List<List<string>> _previouslySelectedYXs = new List<List<string>>();
         ClockTimer _clock = new ClockTimer(); 
 
         // The font used to display UI elements
-        SpriteFont _font;
+        SpriteFont _gameFont;
         Texture2D _texture;
 
         //the sound effects
@@ -67,7 +82,9 @@ namespace EquationFinder.Screens
             this._currentEquation = "";
             this._selectedYXs.Clear();
             this._previouslySelectedYXs.Clear();
-            this.InitializeBoardItems();
+            this._selectedActionTypes.Clear();
+            this._score = 0;
+            this._isBoardInitialized = false;
 
         }
 
@@ -93,7 +110,9 @@ namespace EquationFinder.Screens
             this._currentEquation = "";
             this._selectedYXs.Clear();
             this._previouslySelectedYXs.Clear();
-            this.InitializeBoardItems();
+            this._selectedActionTypes.Clear();
+            this._score = 0;
+            this._isBoardInitialized = false;
 
         }
 
@@ -109,7 +128,7 @@ namespace EquationFinder.Screens
             _texture = content.Load<Texture2D>("img/paper_fibers");
 
             // Load the score font
-            _font = content.Load<SpriteFont>("gameFont");
+            _gameFont = content.Load<SpriteFont>("gameFont");
 
             // Load the laser and explosion sound effect
             _correctSound = content.Load<SoundEffect>("sound/correct");
@@ -151,10 +170,15 @@ namespace EquationFinder.Screens
                     ScreenManager.GraphicsDevice.Viewport.Width,
                     ScreenManager.GraphicsDevice.Viewport.Height), Color.White);
 
-            //// Draw the score
-            spriteBatch.DrawString(_font, "Target: " + _target, new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y), Color.Black);
-            spriteBatch.DrawString(_font, "Equation: " + _currentEquation, new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y + 30), Color.Black);
-            spriteBatch.DrawString(_font, "Time: " + _clock.displayClock, new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y + 60), Color.Black);
+            // Draw the score
+            spriteBatch.DrawString(_gameFont, "Target: " + _target, new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y), Color.Black);
+            spriteBatch.DrawString(_gameFont, "Equation: " + _currentEquation, new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y + 30), Color.Black);
+            spriteBatch.DrawString(_gameFont, "Score: " + this._score.ToString(), new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y + 60), Color.Black);
+            
+            Vector2 timeSize = _gameFont.MeasureString("Time:   " + _clock.displayClock);
+            spriteBatch.DrawString(_gameFont, "Time: " + _clock.displayClock, new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Width - 130,
+                ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y), Color.Black);
+           
 
             int row = 0, col = 0;
             while (row < this._boardSize)
@@ -183,6 +207,23 @@ namespace EquationFinder.Screens
 
             }
 
+            //if we have flash text, draw the string
+            if (_flashText.Active)
+            {
+
+                //calculate where the flash text goes
+                Vector2 textSize = _gameFont.MeasureString(_flashText.Text);
+                Vector2 textCenter = new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, 50f);
+
+                //draw the flash text
+                spriteBatch.DrawString(
+                    _gameFont,
+                    _flashText.Text,
+                    textCenter - (textSize / 2),
+                    Color.DarkBlue);
+
+            }
+
             // Stop drawing
             spriteBatch.End();
 
@@ -194,12 +235,58 @@ namespace EquationFinder.Screens
             // clock start and update  
             if (_clock.isRunning == false)
             {
+
+                //update the board items
+                if (!this._isBoardInitialized)
+                    UpdateBoardItems();
+
                 //count 60 seconds down 
                 _clock.Start(60);
             }
-            else
+            else if (_clock.isFinished == false)
             {
-                _clock.CheckTime(gameTime);
+
+                if (_flashText.Active == false
+                    || _flashText.RunClock)
+                {
+
+                    //check the game clock
+                    _clock.CheckTime(gameTime);
+
+                    //check to see if we qualified for the next round
+                    if (_clock.displayClock == "Game Over" && this._roundCorrect >= 4)
+                    {
+
+                        //go to the next round
+                        _clock.NextRound(60);
+
+                        //reset the round count
+                        this._roundCorrect = 0;
+
+                        //go to the next number
+                        this._target++;
+
+
+                        //set the flash text
+                        _flashText.Text = string.Format("Next Level {0}", _target);
+                        _flashText.StartTime = gameTime.TotalGameTime.TotalMilliseconds;
+                        _flashText.Active = true;
+                        _flashText.RunClock = true;
+
+
+                    }
+
+                }
+
+                //reset the flash text
+                if( _flashText.Active == true
+                    && (gameTime.TotalGameTime.TotalMilliseconds - _flashText.StartTime) > 1000)
+                {
+                    _flashText.Active = false;
+                    _flashText.Text = "";
+                    _flashText.RunClock = true;
+                }   
+                
             } 
 
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
@@ -284,6 +371,7 @@ namespace EquationFinder.Screens
                     //we used the previous equation so remove it
                     _undoEquations.RemoveAt(_undoEquations.Count() - 1);
                     _undoType.RemoveAt(_undoType.Count() - 1);
+                    _selectedActionTypes.RemoveAt(_selectedActionTypes.Count() - 1);
 
                     //set the previous equation
                     _currentEquation = previousEquation;
@@ -303,6 +391,7 @@ namespace EquationFinder.Screens
                     //add the current equation to the list
                     _undoEquations.Add(_currentEquation);
                     _undoType.Add("Left Parenthesis");
+                    _selectedActionTypes.Add(ActionType.LEFT_PARENTHESIS);
 
                     //update the equation
                     _currentEquation += " (";
@@ -320,6 +409,7 @@ namespace EquationFinder.Screens
                     //add the current equation to the list
                     _undoEquations.Add(_currentEquation);
                     _undoType.Add("Right Parenthesis");
+                    _selectedActionTypes.Add(ActionType.RIGHT_PARENTHESIS);
 
                     //update the equation
                     _currentEquation += ")";
@@ -355,6 +445,9 @@ namespace EquationFinder.Screens
                 if (e.HasErrors())
                 {
 
+                    //set the flash text
+                    _flashText.SetFlashText("Invalid equation", gameTime.TotalGameTime.TotalMilliseconds, true);
+
                     //play the bad sound
                     this.PlaySound(_incorrectSound, gameTime);
 
@@ -372,6 +465,10 @@ namespace EquationFinder.Screens
                         //if they have used the equation previously
                         if (UseEquationPreviously())
                         {
+
+                            //set the flash text
+                            _flashText.SetFlashText("Already used that equation", gameTime.TotalGameTime.TotalMilliseconds, true);
+
                             //play the bad sound
                             this.PlaySound(_incorrectSound, gameTime);
                         }
@@ -386,7 +483,15 @@ namespace EquationFinder.Screens
                                 this._previouslySelectedYXs[this._previouslySelectedYXs.Count - 1].Add(YX);
 
                             //add time back to the clock
-                            _clock.AddTime(4);
+                            _clock.AddTime(10);
+
+                            //we got a correct answer, so we need to calculate the correct answer
+                            this.CalculateScore();
+                            this._totalCorrect++;
+                            this._roundCorrect++;
+
+                            //set the flash text
+                            _flashText.SetFlashText("Correct!", gameTime.TotalGameTime.TotalMilliseconds, true);
 
                             //play the bad sound
                             this.PlaySound(_correctSound, gameTime);
@@ -396,6 +501,9 @@ namespace EquationFinder.Screens
                     }
                     else //if they got it wrong 
                     {
+
+                        //set the flash text
+                        _flashText.SetFlashText(string.Format("Incorrect, you number was {0}", actual), gameTime.TotalGameTime.TotalMilliseconds, true);
 
                         //play the bad sound
                         this.PlaySound(_incorrectSound, gameTime);
@@ -420,6 +528,19 @@ namespace EquationFinder.Screens
 
         #region Private Board Methods
 
+        private void CalculateScore()
+        {
+
+            //get the number of moves
+            var numberOfMoves = this._selectedActionTypes.Where(x =>
+                x == ActionType.NUMBER
+                || x == ActionType.OPERATOR).Count();
+
+            //calculate the new score
+            this._score += this._target * numberOfMoves;
+
+        }
+
         private void PlaySound(SoundEffect soundEffect, GameTime gameTime)
         {
 
@@ -442,6 +563,7 @@ namespace EquationFinder.Screens
                 //add the current equation to the list
                 _undoEquations.Add(_currentEquation);
                 _undoType.Add("Operation");
+                _selectedActionTypes.Add(ActionType.OPERATOR);
 
                 //get the arithmetic symbol
                 var symbol = "+";
@@ -469,6 +591,7 @@ namespace EquationFinder.Screens
                 //add the current equation to the list
                 _undoEquations.Add(_currentEquation);
                 _undoType.Add("Number");
+                _selectedActionTypes.Add(ActionType.NUMBER);
 
                 //get the current value
                 var currentValue = this._gameBoardValues[_currentY, _currentX].ToString();
@@ -490,11 +613,20 @@ namespace EquationFinder.Screens
 
         }
 
-        private void InitializeBoardItems()
+        private void UpdateBoardItems()
         {
 
+            //we need to calculate the start point for the x and y axis
+            int width, height, x, y;
+            width = _boardSize * 50;
+            height = _boardSize * 35;
+
+            //get our starting X position
+            x = (ScreenManager.GraphicsDevice.Viewport.Width / 2) - (width / 2);
+            y = (ScreenManager.GraphicsDevice.Viewport.Height / 9 * 5) - (height / 2);
+
             // start at 175, 175
-            Vector2 position = new Vector2(175f, 175f);
+            Vector2 position = new Vector2(x, y);
 
             int row = 0, col = 0;
             while (row < this._boardSize)
@@ -520,7 +652,7 @@ namespace EquationFinder.Screens
                 //go to the next row
                 row++;
                 col = 0;
-                position.X = 175;
+                position.X = x;
                 position.Y += 35;
 
             }

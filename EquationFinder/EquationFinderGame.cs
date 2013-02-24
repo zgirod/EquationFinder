@@ -46,7 +46,7 @@ namespace EquationFinder
             Components.Add(screenManager);
 
             // Activate the first screens.
-            screenManager.AddScreen(new GameplayScreen(5, 20), null);
+            screenManager.AddScreen(new GameplayScreen(5, 19), null);
 
             base.Initialize();
         }
@@ -60,7 +60,6 @@ namespace EquationFinder
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
         }
 
         /// <summary>

@@ -42,6 +42,13 @@ namespace EquationFinder.Helpers
         {
             endTimer += seconds;
         }
+
+        public void NextRound(int second)
+        {
+            isFinished = false;
+            endTimer += second;
+            displayClock = endTimer.ToString();
+        }
  
         public Boolean CheckTime(GameTime gameTime) 
         { 
@@ -63,7 +70,6 @@ namespace EquationFinder.Helpers
             } 
             else 
             { 
-                 
                 displayClock = "Game Over"; 
             } 
             return isFinished; 

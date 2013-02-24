@@ -16,7 +16,8 @@
     <XnaProfile>Reach</XnaProfile>
     <XnaCrossPlatformGroupID>70170f29-ab36-4997-9a0f-d356aac4cb68</XnaCrossPlatformGroupID>
     <XnaOutputType>Game</XnaOutputType>
-    <ApplicationIcon>Game.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
     <Thumbnail>GameThumbnail.png</Thumbnail>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -86,9 +87,9 @@
     <Compile Include="Input\MoveList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScreenManager\GameScreen.cs" />
-    <Compile Include="ScreenManager\InputState.cs" />
     <Compile Include="ScreenManager\ScreenManager.cs" />
     <Compile Include="Screens\BoardItem.cs" />
+    <Compile Include="Screens\FlashText.cs" />
     <Compile Include="Screens\GameplayScreen.cs" />
     <Compile Include="Screens\PlayerIndexEventArgs.cs" />
   </ItemGroup>
