@@ -12,6 +12,8 @@ using NCalc;
 using EquationFinder.Helpers;
 using EquationFinder.Input;
 using EquationFinder.DomainLogic;
+using Microsoft.Xna.Framework.Storage;
+using EquationFinder.Objects;
 
 namespace EquationFinder.Screens
 {
@@ -47,7 +49,11 @@ namespace EquationFinder.Screens
         List<string> _selectedYXs = new List<string>();
         List<ActionType> _selectedActionTypes = new List<ActionType>();
         List<List<string>> _previouslySelectedYXs = new List<List<string>>();
-        ClockTimer _clock = new ClockTimer(); 
+        ClockTimer _clock = new ClockTimer();
+        IAsyncResult _asyncResult;
+        bool _requestedStorageDevice, _asyncFinsihed, _loadedHighScores;
+        StorageDevice _storageDevice;
+        List<HighScore> _highScores;
 
         // The font used to display UI elements
         SpriteFont _gameFont;
@@ -59,34 +65,6 @@ namespace EquationFinder.Screens
         SoundEffect _incorrectSound;
 
         #region Initialization
-
-        public GameplayScreen(BigInteger gameHash, int target)
-        {
-
-            //setup the transitions
-            TransitionOnTime = TimeSpan.FromSeconds(1.5);
-            TransitionOffTime = TimeSpan.FromSeconds(0.5);
-
-            //set the global variables
-            this._boardSize = GameplayOptions.BoardSize;
-            this._currentX = 0;
-            this._currentY = 0;
-            _selectedX = -1;
-            _selectedY = -1;
-            _target = target;
-
-            //get a board
-            this._gameBoard = new BoardItem[GameplayOptions.BoardSize, GameplayOptions.BoardSize];
-            this._gameBoardValues = BoardLogic.CreateBoard(GameplayOptions.BoardSize, gameHash);
-
-            this._currentEquation = "";
-            this._selectedYXs.Clear();
-            this._previouslySelectedYXs.Clear();
-            this._selectedActionTypes.Clear();
-            this._score = 0;
-            this._isBoardInitialized = false;
-
-        }
 
         public GameplayScreen(int target)
         {
@@ -113,6 +91,10 @@ namespace EquationFinder.Screens
             this._selectedActionTypes.Clear();
             this._score = 0;
             this._isBoardInitialized = false;
+            this._requestedStorageDevice = false;
+            this._asyncFinsihed = false;
+            this._loadedHighScores = false;
+            this._highScores = new List<HighScore>();
 
         }
 
@@ -255,7 +237,7 @@ namespace EquationFinder.Screens
                 }
 
                 //count 60 seconds down 
-                _clock.Start(60);
+                _clock.Start(5);
             }
             else if (_clock.isFinished == false)
             {
@@ -280,13 +262,14 @@ namespace EquationFinder.Screens
                         //go to the next number
                         this._target++;
 
-
                         //set the flash text
                         _flashText.Text = string.Format("Next Level {0}", _target);
                         _flashText.StartTime = gameTime.TotalGameTime.TotalMilliseconds;
                         _flashText.Active = true;
                         _flashText.RunClock = true;
-
+                        
+                        //reset the board for the next level
+                        this.ResetBoardForNextLevel();
 
                     }
 
@@ -300,6 +283,47 @@ namespace EquationFinder.Screens
                     _flashText.Text = "";
                     _flashText.RunClock = true;
                 }   
+
+                //if we want to save the high score file
+                if (_clock.isFinished == true)
+                {
+
+                     this.SaveHighScores("azg");
+
+                }
+
+
+                //if we are finished
+                if (!_requestedStorageDevice)
+                {
+
+                    _requestedStorageDevice = true;
+                    _asyncResult = StorageDevice.BeginShowSelector(null, null);
+
+                }
+
+                if (_requestedStorageDevice == true 
+                    && _asyncFinsihed == false
+                    && _asyncResult.IsCompleted)
+                {
+
+                    _asyncFinsihed = true;
+
+                    //save our storage device
+                    StorageDevice device = StorageDevice.EndShowSelector(_asyncResult);
+                    if (device != null && device.IsConnected)
+                        _storageDevice = device;
+
+                }
+
+                if (_asyncFinsihed == true
+                    && _loadedHighScores == false)
+                {
+
+                    _loadedHighScores = true;
+                    _highScores = this.LoadHighScores();
+
+                }
                 
             } 
 
@@ -309,6 +333,10 @@ namespace EquationFinder.Screens
 
         public override void HandleMove(GameTime gameTime, Move move)
         {
+
+            //don't do anything if the clock isn't running
+            if (_clock.isRunning == false || _clock.isFinished == true)
+                return;
 
             if (move.Name == "Down")
             {
@@ -877,6 +905,55 @@ namespace EquationFinder.Screens
             return false;
 
         }
+
+        private void ResetBoardForNextLevel()
+        {
+            this._currentEquation = "";
+            this._selectedYXs.Clear();
+            this._previouslySelectedYXs.Clear();
+            this._selectedActionTypes.Clear();
+        }
+
+        #endregion
+
+        #region High Score Methods
+
+        public void SaveHighScores(string initials)
+        {
+
+            //add the new high score object
+            _highScores.Add(new HighScore() 
+            {
+                Initials = initials,
+                Score = _score
+            });
+
+            //save the file
+            StorageHelper.SaveFile(_storageDevice, _highScores, BoardHighScoreFileName);
+
+        }
+
+        public List<HighScore> LoadHighScores()
+        {
+
+            //get the high scores
+            return StorageHelper.GetHighScores(_storageDevice, BoardHighScoreFileName);
+
+        }
+
+        #endregion
+
+        #region Read Only Properties
+
+
+        private string BoardHighScoreFileName 
+        {
+            get
+            {
+                return string.Format("HighScores{0}.txt", _boardSize);
+            }
+        }
+
 
         #endregion
 
