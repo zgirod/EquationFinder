@@ -5,6 +5,8 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using EquationFinder;
+using Microsoft.Xna.Framework.Input;
+using EquationFinder.Input;
 
 namespace EquationFinder.Screens
 {
@@ -19,6 +21,9 @@ namespace EquationFinder.Screens
         List<MenuEntry> menuEntries = new List<MenuEntry>();
         int selectedEntry = 0;
         string menuTitle;
+
+        public GamePadState GamePadState { get; private set; }
+        public KeyboardState KeyboardState { get; private set; }
 
         #endregion
 
@@ -88,25 +93,7 @@ namespace EquationFinder.Screens
         public override void HandleMove(GameTime gameTime, Input.Move move)
         {
 
-            if (move.Name == "Up")
-            {
-
-                selectedEntry--;
-
-                if (selectedEntry < 0)
-                    selectedEntry = menuEntries.Count - 1;
-
-            }
-            else if (move.Name == "Down")
-            {
-
-                selectedEntry++;
-
-                if (selectedEntry >= menuEntries.Count)
-                    selectedEntry = 0;
-
-            }
-            else if (move.Name == "A")
+            if (move.Name == "A")
             {
                 OnSelectEntry(selectedEntry);
             }
@@ -117,7 +104,6 @@ namespace EquationFinder.Screens
 
         }
 
-
         /// <summary>
         /// Handler for when the user has chosen a menu entry.
         /// </summary>
@@ -125,7 +111,6 @@ namespace EquationFinder.Screens
         {
             menuEntries[entryIndex].OnSelectEntry();
         }
-
 
         /// <summary>
         /// Handler for when the user has cancelled the menu.
@@ -135,7 +120,6 @@ namespace EquationFinder.Screens
             ExitScreen();
         }
 
-
         /// <summary>
         /// Helper overload makes it easy to use OnCancel as a MenuEntry event handler.
         /// </summary>
@@ -144,6 +128,30 @@ namespace EquationFinder.Screens
             OnCancel();
         }
 
+        private void HandleDirection(Buttons buttons)
+        {
+
+            if (buttons.HasFlag(Buttons.DPadUp) || buttons.HasFlag(Buttons.LeftThumbstickUp))
+            {
+
+                selectedEntry--;
+
+                if (selectedEntry < 0)
+                    selectedEntry = menuEntries.Count - 1;
+
+            }
+            else if (buttons.HasFlag(Buttons.DPadDown) || buttons.HasFlag(Buttons.LeftThumbstickDown))
+            {
+
+
+                selectedEntry++;
+
+                if (selectedEntry >= menuEntries.Count)
+                    selectedEntry = 0;
+
+            }
+
+        }
 
         #endregion
 
@@ -202,12 +210,16 @@ namespace EquationFinder.Screens
                 menuEntries[i].Update(this, isSelected, gameTime);
             }
 
-            //for (int i = 0; i < menuEntries.Count; i++)
-            //{
-            //    bool isSelected = IsActive && (i == selectedEntry);
+            GamePadState lastGamePadState = GamePadState;
+            KeyboardState lastKeyboardState = KeyboardState;
+            GamePadState = GamePad.GetState(PlayerIndex.One);
+            KeyboardState = Keyboard.GetState(PlayerIndex.One);
 
-            //    menuEntries[i].Update(this, isSelected, gameTime);
-            //}
+            //get the direction
+            var direction = Direction.FromInput(GamePadState, KeyboardState);
+            if (Direction.FromInput(lastGamePadState, lastKeyboardState) != direction && direction != 0.0)
+                this.HandleDirection(direction);
+            
         }
 
 

@@ -14,6 +14,7 @@ using EquationFinder.Input;
 using EquationFinder.DomainLogic;
 using Microsoft.Xna.Framework.Storage;
 using EquationFinder.Objects;
+using Microsoft.Xna.Framework.GamerServices;
 
 namespace EquationFinder.Screens
 {
@@ -29,7 +30,7 @@ namespace EquationFinder.Screens
     public class GameplayScreen : GameScreen
     {
 
-        ContentManager content;
+        ContentManager _content;
 
         //board variables
         int _boardSize;
@@ -54,6 +55,7 @@ namespace EquationFinder.Screens
         bool _requestedStorageDevice, _asyncFinsihed, _loadedHighScores;
         StorageDevice _storageDevice;
         List<HighScore> _highScores;
+        Int64 _highScoreToBeat = 0;
 
         // The font used to display UI elements
         SpriteFont _gameFont;
@@ -63,6 +65,9 @@ namespace EquationFinder.Screens
         double _lastPlayedSound = 0;
         SoundEffect _correctSound;
         SoundEffect _incorrectSound;
+
+        public GamePadState GamePadState { get; private set; }
+        public KeyboardState KeyboardState { get; private set; }
 
         #region Initialization
 
@@ -95,6 +100,7 @@ namespace EquationFinder.Screens
             this._asyncFinsihed = false;
             this._loadedHighScores = false;
             this._highScores = new List<HighScore>();
+            this._highScoreToBeat = 0;
 
         }
 
@@ -103,18 +109,18 @@ namespace EquationFinder.Screens
         /// </summary>
         public override void LoadContent()
         {
-            if (content == null)
-                content = new ContentManager(ScreenManager.Game.Services, "Content");
+            if (_content == null)
+                _content = new ContentManager(ScreenManager.Game.Services, "Content");
 
             // Load the background texture we will be using
-            _texture = content.Load<Texture2D>("img/paper_fibers");
+            _texture = _content.Load<Texture2D>("img/paper_fibers");
 
             // Load the score font
-            _gameFont = content.Load<SpriteFont>("gameFont");
+            _gameFont = _content.Load<SpriteFont>("gameFont");
 
             // Load the laser and explosion sound effect
-            _correctSound = content.Load<SoundEffect>("sound/correct");
-            _incorrectSound = content.Load<SoundEffect>("sound/incorrect");
+            _correctSound = _content.Load<SoundEffect>("sound/correct");
+            _incorrectSound = _content.Load<SoundEffect>("sound/incorrect");
 
             // once the load has finished, we use ResetElapsedTime to tell the game's
             // timing mechanism that we have just finished a very long frame, and that
@@ -128,10 +134,12 @@ namespace EquationFinder.Screens
         /// </summary>
         public override void UnloadContent()
         {
-            content.Unload();
+            _content.Unload();
         }
 
         #endregion
+
+        #region Public Override Methods
 
         public override void Draw(GameTime gameTime)
         {
@@ -237,13 +245,12 @@ namespace EquationFinder.Screens
                 }
 
                 //count 60 seconds down 
-                _clock.Start(5);
+                _clock.Start(60);
             }
             else if (_clock.isFinished == false)
             {
 
-                if (_flashText.Active == false
-                    || _flashText.RunClock)
+                if (_flashText.Active == false || _flashText.RunClock)
                 {
 
                     //check the game clock
@@ -288,7 +295,11 @@ namespace EquationFinder.Screens
                 if (_clock.isFinished == true)
                 {
 
-                     this.SaveHighScores("azg");
+                    //if out score is greater than the high score we need to beat
+                    if (_score > _highScoreToBeat)
+                    {
+                        this.SaveHighScores("azg");
+                    }
 
                 }
 
@@ -320,12 +331,30 @@ namespace EquationFinder.Screens
                     && _loadedHighScores == false)
                 {
 
+                    //load the high scores
                     _loadedHighScores = true;
                     _highScores = this.LoadHighScores();
 
+                    //set the high score we need to beat to store our score
+                    if (_highScores.Count >= 5)
+                        _highScoreToBeat = _highScores.Min(x => x.Score);
+                    else
+                        _highScoreToBeat = 0;
+
+
                 }
                 
-            } 
+            }
+
+            GamePadState lastGamePadState = GamePadState;
+            KeyboardState lastKeyboardState = KeyboardState;
+            GamePadState = GamePad.GetState(PlayerIndex.One);
+            KeyboardState = Keyboard.GetState(PlayerIndex.One);
+
+            //get the direction
+            var direction = Direction.FromInput(GamePadState, KeyboardState);
+            if (Direction.FromInput(lastGamePadState, lastKeyboardState) != direction && direction != 0.0)
+                this.HandleDirection(direction);
 
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
 
@@ -338,39 +367,7 @@ namespace EquationFinder.Screens
             if (_clock.isRunning == false || _clock.isFinished == true)
                 return;
 
-            if (move.Name == "Down")
-            {
-
-                this._currentY++;
-                if (this._currentY >= this._boardSize)
-                    this._currentY = 0;
-
-            }
-            else if (move.Name == "Left")
-            {
-
-                this._currentX--;
-                if (this._currentX < 0)
-                    this._currentX = this._boardSize - 1;
-
-            }
-            else if (move.Name == "Up")
-            {
-
-                this._currentY--;
-                if (this._currentY < 0)
-                    this._currentY = this._boardSize - 1;
-
-            }
-            else if (move.Name == "Right")
-            {
-
-                this._currentX++;
-                if (this._currentX >= this._boardSize)
-                    this._currentX = 0;
-
-            }
-            else if (move.Name == "Undo")
+            if (move.Name == "Undo")
             {
 
                 //if we have previous equations to undo
@@ -568,7 +565,47 @@ namespace EquationFinder.Screens
 
         }
 
+        #endregion
+
         #region Private Board Methods
+
+        private void HandleDirection(Buttons direction)
+        {
+
+            if (direction.HasFlag(Buttons.DPadDown) || direction.HasFlag(Buttons.LeftThumbstickDown))
+            {
+
+                this._currentY++;
+                if (this._currentY >= this._boardSize)
+                    this._currentY = 0;
+
+            }
+            else if (direction.HasFlag(Buttons.DPadLeft) || direction.HasFlag(Buttons.LeftThumbstickLeft))
+            {
+
+                this._currentX--;
+                if (this._currentX < 0)
+                    this._currentX = this._boardSize - 1;
+
+            }
+            else if (direction.HasFlag(Buttons.DPadUp) || direction.HasFlag(Buttons.LeftThumbstickUp))
+            {
+
+                this._currentY--;
+                if (this._currentY < 0)
+                    this._currentY = this._boardSize - 1;
+
+            }
+            else if (direction.HasFlag(Buttons.DPadRight) || direction.HasFlag(Buttons.LeftThumbstickRight))
+            {
+
+                this._currentX++;
+                if (this._currentX >= this._boardSize)
+                    this._currentX = 0;
+
+            }
+
+        }
 
         private void CalculateScore()
         {

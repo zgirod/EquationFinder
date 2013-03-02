@@ -88,10 +88,12 @@
     <Compile Include="Input\Move.cs" />
     <Compile Include="Input\MoveList.cs" />
     <Compile Include="Objects\HighScore.cs" />
+    <Compile Include="Objects\ScreenText.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScreenManager\GameScreen.cs" />
     <Compile Include="ScreenManager\ScreenManager.cs" />
     <Compile Include="Screens\BoardItem.cs" />
+    <Compile Include="Screens\FAQScreen.cs" />
     <Compile Include="Screens\FlashText.cs" />
     <Compile Include="Screens\GameplayOptions.cs" />
     <Compile Include="Screens\GameplayScreen.cs" />

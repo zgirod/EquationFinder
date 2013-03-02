@@ -26,7 +26,7 @@ namespace EquationFinder.Screens
             MenuEntries.Add(menuEntry);
 
             //add the how it works option
-            menuEntry = new MenuEntry("How the game works", "How");
+            menuEntry = new MenuEntry("F.A.Q", "FAQ");
             menuEntry.Selected += MenuEntry_Selected;
             MenuEntries.Add(menuEntry);
 
@@ -59,6 +59,21 @@ namespace EquationFinder.Screens
 
                 //load the game play screen
                 LoadingScreen.Load(ScreenManager, true, null, new GameplayScreen(19));
+
+            }
+            else if (key == "FAQ")
+            {
+
+
+                //load the game play screen
+                LoadingScreen.Load(ScreenManager, true, null, new FAQScreen());
+
+            }
+            else if (key == "Exit")
+            {
+
+                //exit the game
+                ScreenManager.Game.Exit();
 
             }
 
