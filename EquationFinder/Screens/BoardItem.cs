@@ -142,7 +142,7 @@ namespace EquationFinder.Screens
 
 
             // Draw the selected entry in yellow, otherwise white.
-            Color color = isSelected ? Color.Yellow : Color.Black;
+            Color color = isSelected ? Color.Red : Color.Black;
 
             //if the item isn't selected, check to see if it is previously selectedd
             if (!isSelected && isPreviouslySelected)

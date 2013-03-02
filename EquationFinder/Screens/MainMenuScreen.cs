@@ -12,7 +12,7 @@ namespace EquationFinder.Screens
         /// <summary>
         /// Constructor fills in the menu contents.
         /// </summary>
-        public MainMenuScreen() : base("Main Menu")
+        public MainMenuScreen() : base("Equation Finder")
         {
 
             //add the play game
@@ -37,6 +37,11 @@ namespace EquationFinder.Screens
 
             //add the options entry
             menuEntry = new MenuEntry("Game Options", "Options");
+            menuEntry.Selected += MenuEntry_Selected;
+            MenuEntries.Add(menuEntry);
+
+            //add the make your own game entry
+            menuEntry = new MenuEntry("Make your own game", "Make");
             menuEntry.Selected += MenuEntry_Selected;
             MenuEntries.Add(menuEntry);
 
@@ -74,6 +79,20 @@ namespace EquationFinder.Screens
 
                 //exit the game
                 ScreenManager.Game.Exit();
+
+            }
+            else if (key == "Options")
+            {
+
+                //load the game options
+                LoadingScreen.Load(ScreenManager, true, null, new OptionsScreen());
+
+            }
+            else if (key == "Scores")
+            {
+
+                //load the high scores screen
+                LoadingScreen.Load(ScreenManager, true, null, new HighScoresScreen());
 
             }
 

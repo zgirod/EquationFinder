@@ -51,11 +51,11 @@ namespace EquationFinder.Screens
         List<ActionType> _selectedActionTypes = new List<ActionType>();
         List<List<string>> _previouslySelectedYXs = new List<List<string>>();
         ClockTimer _clock = new ClockTimer();
-        IAsyncResult _asyncResult;
-        bool _requestedStorageDevice, _asyncFinsihed, _loadedHighScores;
-        StorageDevice _storageDevice;
+        bool _loadedHighScores;
         List<HighScore> _highScores;
         Int64 _highScoreToBeat = 0;
+        int _secondsPerRound = 60;
+        int _secondForCorrectAnswer = 6;
 
         // The font used to display UI elements
         SpriteFont _gameFont;
@@ -96,8 +96,6 @@ namespace EquationFinder.Screens
             this._selectedActionTypes.Clear();
             this._score = 0;
             this._isBoardInitialized = false;
-            this._requestedStorageDevice = false;
-            this._asyncFinsihed = false;
             this._loadedHighScores = false;
             this._highScores = new List<HighScore>();
             this._highScoreToBeat = 0;
@@ -245,7 +243,7 @@ namespace EquationFinder.Screens
                 }
 
                 //count 60 seconds down 
-                _clock.Start(60);
+                _clock.Start(_secondsPerRound);
             }
             else if (_clock.isFinished == false)
             {
@@ -261,7 +259,7 @@ namespace EquationFinder.Screens
                     {
 
                         //go to the next round
-                        _clock.NextRound(60);
+                        _clock.NextRound(_secondsPerRound);
 
                         //reset the round count
                         this._roundCorrect = 0;
@@ -295,40 +293,12 @@ namespace EquationFinder.Screens
                 if (_clock.isFinished == true)
                 {
 
-                    //if out score is greater than the high score we need to beat
-                    if (_score > _highScoreToBeat)
-                    {
-                        this.SaveHighScores("azg");
-                    }
+                    // the game is over, show the high score screen
+                    LoadingScreen.Load(ScreenManager, true, null, new SaveHighScoreScreen(_boardSize, _score, _score > _highScoreToBeat));
 
                 }
 
-
-                //if we are finished
-                if (!_requestedStorageDevice)
-                {
-
-                    _requestedStorageDevice = true;
-                    _asyncResult = StorageDevice.BeginShowSelector(null, null);
-
-                }
-
-                if (_requestedStorageDevice == true 
-                    && _asyncFinsihed == false
-                    && _asyncResult.IsCompleted)
-                {
-
-                    _asyncFinsihed = true;
-
-                    //save our storage device
-                    StorageDevice device = StorageDevice.EndShowSelector(_asyncResult);
-                    if (device != null && device.IsConnected)
-                        _storageDevice = device;
-
-                }
-
-                if (_asyncFinsihed == true
-                    && _loadedHighScores == false)
+                if (_loadedHighScores == false)
                 {
 
                     //load the high scores
@@ -522,7 +492,7 @@ namespace EquationFinder.Screens
                                 this._previouslySelectedYXs[this._previouslySelectedYXs.Count - 1].Add(YX);
 
                             //add time back to the clock
-                            _clock.AddTime(10);
+                            _clock.AddTime(_secondForCorrectAnswer);
 
                             //we got a correct answer, so we need to calculate the correct answer
                             this.CalculateScore();
@@ -966,7 +936,7 @@ namespace EquationFinder.Screens
             });
 
             //save the file
-            StorageHelper.SaveFile(_storageDevice, _highScores, BoardHighScoreFileName);
+            StorageHelper.SaveHighScores(_highScores, _boardSize);
 
         }
 
@@ -974,26 +944,12 @@ namespace EquationFinder.Screens
         {
 
             //get the high scores
-            return StorageHelper.GetHighScores(_storageDevice, BoardHighScoreFileName);
+            return StorageHelper.LoadHighScores(_boardSize);
 
         }
 
         #endregion
-
-        #region Read Only Properties
-
-
-        private string BoardHighScoreFileName 
-        {
-            get
-            {
-                return string.Format("HighScores{0}.txt", _boardSize);
-            }
-        }
-
-
-        #endregion
-
 
     }
+
 }

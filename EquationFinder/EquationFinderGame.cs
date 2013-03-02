@@ -9,6 +9,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using EquationFinder.Screens;
+using Microsoft.Xna.Framework.Storage;
+using EquationFinder.Helpers;
 
 namespace EquationFinder
 {
@@ -21,8 +23,12 @@ namespace EquationFinder
 
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-
         ScreenManager screenManager;
+
+        private IAsyncResult _asyncResult;
+        private bool _requestedStorageDevice, _asyncFinsihed, _loadedHighScores;
+        private static StorageDevice _storageDevice;
+        public static StorageDevice StorageDevice { get { return _storageDevice; } }
 
         public EquationFinderGame()
         {
@@ -46,6 +52,11 @@ namespace EquationFinder
 
             //add the screen manager as a component
             Components.Add(screenManager);
+
+            //reset the storage device settings
+            this._requestedStorageDevice = false;
+            this._asyncFinsihed = false;
+            this._loadedHighScores = false;
 
             // Activate the first screens.
             GameplayOptions.BoardSize = 5;
@@ -82,11 +93,38 @@ namespace EquationFinder
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
 
-            // TODO: Add your update logic here
+            //if we are finished
+            if (!_requestedStorageDevice)
+            {
+
+                _requestedStorageDevice = true;
+                _asyncResult = StorageDevice.BeginShowSelector(null, null);
+
+            }
+
+            if (_requestedStorageDevice == true
+                && _asyncFinsihed == false
+                && _asyncResult.IsCompleted)
+            {
+
+                _asyncFinsihed = true;
+
+                //save our storage device
+                StorageDevice device = StorageDevice.EndShowSelector(_asyncResult);
+                if (device != null && device.IsConnected)
+                {
+
+                    //set the device
+                    _storageDevice = device;
+
+                    //load the game settings
+                    StorageHelper.LoadGameSettings();
+
+                }
+
+            }
+
 
             base.Update(gameTime);
         }

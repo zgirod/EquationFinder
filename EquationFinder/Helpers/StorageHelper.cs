@@ -5,22 +5,118 @@ using System.Text;
 using Microsoft.Xna.Framework.Storage;
 using System.IO;
 using EquationFinder.Objects;
+using EquationFinder.Screens;
 
 namespace EquationFinder.Helpers
 {
     public static class StorageHelper
     {
 
-        public static void SaveFile(StorageDevice device, List<HighScore> highScores, string fileName)
+        private static string _gameSettingsFileName = "GameSettings.txt";
+
+        public static string HighScroreFileName(int boardSize)
+        {
+            return string.Format("HighScores{0}.txt", boardSize);
+        }
+
+        public static void SaveGameSettings()
         {
 
             // Open a storage container.
-            IAsyncResult result = device.BeginOpenContainer("EquationFinder", null, null);
+            IAsyncResult result = EquationFinderGame.StorageDevice.BeginOpenContainer("EquationFinder", null, null);
 
             // Wait for the WaitHandle to become signaled.
             result.AsyncWaitHandle.WaitOne();
 
-            StorageContainer container = device.EndOpenContainer(result);
+            StorageContainer container = EquationFinderGame.StorageDevice.EndOpenContainer(result);
+
+            // Close the wait handle.
+            result.AsyncWaitHandle.Close();
+
+            //if we have a file, delete it
+            if (container.FileExists(_gameSettingsFileName))
+                container.DeleteFile(_gameSettingsFileName);
+
+            // Create a new file.
+            if (!container.FileExists(_gameSettingsFileName))
+            {
+                Stream file = container.CreateFile(_gameSettingsFileName);
+
+                using (StreamWriter sw = new StreamWriter(file))
+                {
+
+                    sw.WriteLine(GameplayOptions.BoardSize.ToString());
+                    sw.WriteLine(GameplayOptions.PlaySoundEffects.ToString());
+
+                }
+
+
+                file.Close();
+            }
+
+            // Dispose the container, to commit the data.
+            container.Dispose();
+        }
+
+        public static void LoadGameSettings()
+        {
+
+            // Open a storage container.
+            IAsyncResult result = EquationFinderGame.StorageDevice.BeginOpenContainer("EquationFinder", null, null);
+
+            // Wait for the WaitHandle to become signaled.
+            result.AsyncWaitHandle.WaitOne();
+
+            StorageContainer container = EquationFinderGame.StorageDevice.EndOpenContainer(result);
+
+            // Close the wait handle.
+            result.AsyncWaitHandle.Close();
+
+            // if we have a file
+            int row = 1;
+            if (container.FileExists(_gameSettingsFileName))
+            {
+
+                //open the file
+                Stream file = container.OpenFile(_gameSettingsFileName, FileMode.Open);
+
+                //loop through each file
+                using (StreamReader sr = new StreamReader(file))
+                {
+                    while (!sr.EndOfStream)
+                    {
+
+                        if (row == 1)
+                            GameplayOptions.BoardSize = Convert.ToInt32(sr.ReadLine());
+                        else
+                            GameplayOptions.PlaySoundEffects = Convert.ToBoolean(sr.ReadLine());
+
+                        row++;
+
+                    }
+                }
+
+                //close the file
+                file.Close();
+
+            }
+
+            // Dispose the container, to commit the data.
+            container.Dispose();
+        }
+
+        public static void SaveHighScores(List<HighScore> highScores, int boardSize)
+        {
+
+            var fileName = StorageHelper.HighScroreFileName(boardSize);
+
+            // Open a storage container.
+            IAsyncResult result = EquationFinderGame.StorageDevice.BeginOpenContainer("EquationFinder", null, null);
+
+            // Wait for the WaitHandle to become signaled.
+            result.AsyncWaitHandle.WaitOne();
+
+            StorageContainer container = EquationFinderGame.StorageDevice.EndOpenContainer(result);
 
             // Close the wait handle.
             result.AsyncWaitHandle.Close();
@@ -28,8 +124,6 @@ namespace EquationFinder.Helpers
             //if we have a file, delete it
             if (container.FileExists(fileName))
                 container.DeleteFile(fileName);
-
-
             
             // Create a new file.
             if (!container.FileExists(fileName))
@@ -54,17 +148,18 @@ namespace EquationFinder.Helpers
             container.Dispose();
         }
 
-        public static List<HighScore> GetHighScores(StorageDevice device, string fileName)
+        public static List<HighScore> LoadHighScores(int boardSize)
         {
 
             var highScores = new List<HighScore>();
+            var fileName = StorageHelper.HighScroreFileName(boardSize);
 
-            IAsyncResult result = device.BeginOpenContainer("EquationFinder", null, null);
+            IAsyncResult result = EquationFinderGame.StorageDevice.BeginOpenContainer("EquationFinder", null, null);
 
             // Wait for the WaitHandle to become signaled.
             result.AsyncWaitHandle.WaitOne();
 
-            StorageContainer container = device.EndOpenContainer(result);
+            StorageContainer container = EquationFinderGame.StorageDevice.EndOpenContainer(result);
 
             // Close the wait handle.
             result.AsyncWaitHandle.Close();
