@@ -27,8 +27,10 @@ namespace EquationFinder
 
         private IAsyncResult _asyncResult;
         private bool _requestedStorageDevice, _asyncFinsihed, _loadedHighScores;
+        
         private static StorageDevice _storageDevice;
         public static StorageDevice StorageDevice { get { return _storageDevice; } }
+        public static bool IsTrailMode;
 
         public EquationFinderGame()
         {
@@ -62,6 +64,9 @@ namespace EquationFinder
             GameplayOptions.BoardSize = 5;
             GameplayOptions.PlaySoundEffects = true;
             screenManager.AddScreen(new MainMenuScreen(), null);
+
+            //set whether we are in a trail mode or not
+            EquationFinderGame.IsTrailMode = Guide.IsTrialMode;
 
             base.Initialize();
         }

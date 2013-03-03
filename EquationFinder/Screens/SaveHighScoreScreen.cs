@@ -209,6 +209,25 @@ namespace EquationFinder.Screens
                 LoadingScreen.Load(ScreenManager, true, null, new MainMenuScreen());
 
             }
+            else if (move.Name == "A")
+            {
+
+                //if we have a high score
+                if (_hasHighScore) 
+                {
+
+                    //set the initials for the high score
+                    _highScores[_highScoreToEnter].Initials = string.Format("{0}{1}{2}", _first, _second, _third);
+
+                    //save the new high scores
+                    StorageHelper.SaveHighScores(_highScores, _boardSize);
+
+                }
+
+                //go back to the menu
+                LoadingScreen.Load(ScreenManager, true, null, new MainMenuScreen());                
+
+            }
 
             base.HandleMove(gameTime, move);
         }
@@ -240,6 +259,49 @@ namespace EquationFinder.Screens
                     _letterNumber = 3;
                 else if (_letterNumber == 3)
                     _letterNumber = 1;
+
+            }
+            else if (buttons.HasFlag(Buttons.DPadUp) || buttons.HasFlag(Buttons.LeftThumbstickUp)
+            || buttons.HasFlag(Buttons.DPadDown) || buttons.HasFlag(Buttons.LeftThumbstickDown))
+            {
+
+                //get the letter we care about
+                var letter = _first;
+                if (_letterNumber == 2)
+                    letter = _second;
+                else if (_letterNumber == 3)
+                    letter = _third;
+
+                //get the index letter
+                var letterIndex = _availableCharacters.IndexOf(letter);
+
+                //get the next letter
+                if (buttons.HasFlag(Buttons.DPadUp) || buttons.HasFlag(Buttons.LeftThumbstickUp))
+                {
+
+                    //increase the letter by one
+                    letterIndex++;
+                    if (letterIndex >= _availableCharacters.Count())
+                        letterIndex = 0;
+
+                }
+                else
+                {
+
+                    //decrease the letter by one
+                    letterIndex--;
+                    if (letterIndex < 0)
+                        letterIndex = _availableCharacters.Count() - 1;
+
+                }
+                
+                //set the letter
+                if (_letterNumber == 1)
+                    _first = _availableCharacters[letterIndex].ToString();
+                else if (_letterNumber == 2)
+                    _second = _availableCharacters[letterIndex].ToString();
+                else if (_letterNumber == 3)
+                    _third = _availableCharacters[letterIndex].ToString();
 
             }
 

@@ -54,7 +54,7 @@ namespace EquationFinder.Screens
         bool _loadedHighScores;
         List<HighScore> _highScores;
         Int64 _highScoreToBeat = 0;
-        int _secondsPerRound = 60;
+        int _secondsPerRound = 10;
         int _secondForCorrectAnswer = 6;
 
         // The font used to display UI elements
@@ -255,7 +255,7 @@ namespace EquationFinder.Screens
                     _clock.CheckTime(gameTime);
 
                     //check to see if we qualified for the next round
-                    if (_clock.displayClock == "Game Over" && this._roundCorrect >= 4)
+                    if (_clock.displayClock == "Game Over" && this._roundCorrect >= 4 && EquationFinderGame.IsTrailMode == false)
                     {
 
                         //go to the next round
