@@ -195,7 +195,7 @@ namespace EquationFinder.Screens
 
             //add some text
             y = AddTextToList("Q: Why does it start on 19?", y, false, false);
-            y = AddTextToList("Because that is my birthday", y, true, true);
+            y = AddTextToList("Because that is my birthday.", y, true, true);
             y = AddTextToList("Q: How do I go to the next number?", y, false, true);
             y = AddTextToList("If you get 4 or more equations correct you can move to the next number.", y, true, true);
             y = AddTextToList("Q: What do I get in the trail mode?", y, false, true);

@@ -130,7 +130,9 @@ namespace EquationFinder
                     new Move("Right Parenthesis",    
                         Buttons.RightShoulder),
                     new Move("Back", 
-                        Buttons.Back)
+                        Buttons.Back),
+                    new Move("Start",
+                        Buttons.Start)
                 };
 
             // Construct a move list which will store its own copy of the moves array.

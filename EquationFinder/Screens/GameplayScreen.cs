@@ -54,8 +54,9 @@ namespace EquationFinder.Screens
         bool _loadedHighScores;
         List<HighScore> _highScores;
         Int64 _highScoreToBeat = 0;
-        int _secondsPerRound = 10;
-        int _secondForCorrectAnswer = 6;
+        int _secondsPerRound = 60;
+        int _secondForCorrectAnswer = 5;
+        bool _isPaused;
 
         // The font used to display UI elements
         SpriteFont _gameFont;
@@ -99,6 +100,7 @@ namespace EquationFinder.Screens
             this._loadedHighScores = false;
             this._highScores = new List<HighScore>();
             this._highScoreToBeat = 0;
+            this._isPaused = false;
 
         }
 
@@ -245,7 +247,7 @@ namespace EquationFinder.Screens
                 //count 60 seconds down 
                 _clock.Start(_secondsPerRound);
             }
-            else if (_clock.isFinished == false)
+            else if (_clock.isFinished == false && _isPaused == false)
             {
 
                 if (_flashText.Active == false || _flashText.RunClock)
@@ -337,199 +339,11 @@ namespace EquationFinder.Screens
             if (_clock.isRunning == false || _clock.isFinished == true)
                 return;
 
-            if (move.Name == "Undo")
-            {
-
-                //if we have previous equations to undo
-                if (_undoEquations.Count() > 0)
-                {
-
-                    //get if we have an undo number
-                    var undoType = _undoType[_undoType.Count() - 1];
-
-                    //if we have a number to undo
-                    if (undoType == "Number")
-                    {
-
-                        ////remove the most recent selected
-                        _selectedYXs.RemoveAt(_selectedYXs.Count() - 1);
-
-                        if (_selectedYXs.Count() > 0)
-                        {
-
-                            var crumbs = _selectedYXs[_selectedYXs.Count() - 1].Split(new char[] { ',' });
-                            _selectedY = Convert.ToInt32(crumbs[0]);
-                            _selectedX = Convert.ToInt32(crumbs[1]);
-
-
-                        }
-                        else
-                        {
-
-                            //update the selected values
-                            _selectedX = -1;
-                            _selectedY = -1;
-
-                        }
-
-                    }
-                    
-                    //get the previous equation
-                    var previousEquation = _undoEquations[_undoEquations.Count() - 1];
-
-                    //we used the previous equation so remove it
-                    _undoEquations.RemoveAt(_undoEquations.Count() - 1);
-                    _undoType.RemoveAt(_undoType.Count() - 1);
-                    _selectedActionTypes.RemoveAt(_selectedActionTypes.Count() - 1);
-
-                    //set the previous equation
-                    _currentEquation = previousEquation;
-
-
-
-
-                }
-
-            }
-            else if (move.Name == "Left Parenthesis")
-            {
-
-                if (this.IsValidLeftParenthesisMove(gameTime))
-                {
-
-                    //add the current equation to the list
-                    _undoEquations.Add(_currentEquation);
-                    _undoType.Add("Left Parenthesis");
-                    _selectedActionTypes.Add(ActionType.LEFT_PARENTHESIS);
-
-                    //update the equation
-                    _currentEquation += " (";
-                    _currentEquation = _currentEquation.Trim();
-
-                }
-
-            }
-            else if (move.Name == "Right Parenthesis")
-            {
-
-                if (this.IsValidRightParenthesisMove(gameTime))
-                {
-
-                    //add the current equation to the list
-                    _undoEquations.Add(_currentEquation);
-                    _undoType.Add("Right Parenthesis");
-                    _selectedActionTypes.Add(ActionType.RIGHT_PARENTHESIS);
-
-                    //update the equation
-                    _currentEquation += ")";
-
-                }
-
-            }
-
-            else if (move.Name == "A"
-                || move.Name == "B"
-                || move.Name == "X"
-                || move.Name == "Y")
-            {
-
-                this.AddOperation(gameTime, move);
-
-            }
-            else if (move.Name == "Select")
-            {
-                this.SelectNumber(gameTime, move);
-            }
-            else if (move.Name == "Evaluate")
-            {
-
-                //if we don't have a current equation, select the current number
-                if (String.IsNullOrWhiteSpace(_currentEquation.Trim(new char[] { '(', ')' })))
-                    return;
-
-                //create an expression for the current equation
-                Expression e = new Expression(this._currentEquation);
-
-                //if the equation has errors
-                if (e.HasErrors())
-                {
-
-                    //set the flash text
-                    _flashText.SetFlashText("Invalid equation", gameTime.TotalGameTime.TotalMilliseconds, true);
-
-                    //play the bad sound
-                    this.PlaySound(_incorrectSound, gameTime);
-
-                }
-                else //if we don't have any errors
-                {
-
-                    //get the value of the actual expression entered
-                    var actual = Convert.ToInt32(e.Evaluate());
-
-                    //if they got it right
-                    if (actual == _target)
-                    {
-
-                        //if they have used the equation previously
-                        if (UseEquationPreviously())
-                        {
-
-                            //set the flash text
-                            _flashText.SetFlashText("Already used that equation", gameTime.TotalGameTime.TotalMilliseconds, true);
-
-                            //play the bad sound
-                            this.PlaySound(_incorrectSound, gameTime);
-                        }
-                        else
-                        {
-
-                            //add the correct path to the previously used paths
-                            this._previouslySelectedYXs.Add(new List<string>());
-
-                            //add the YXs used in this equation
-                            foreach (var YX in _selectedYXs)
-                                this._previouslySelectedYXs[this._previouslySelectedYXs.Count - 1].Add(YX);
-
-                            //add time back to the clock
-                            _clock.AddTime(_secondForCorrectAnswer);
-
-                            //we got a correct answer, so we need to calculate the correct answer
-                            this.CalculateScore();
-                            this._totalCorrect++;
-                            this._roundCorrect++;
-
-                            //set the flash text
-                            _flashText.SetFlashText("Correct!", gameTime.TotalGameTime.TotalMilliseconds, true);
-
-                            //play the bad sound
-                            this.PlaySound(_correctSound, gameTime);
-
-                        }
-
-                    }
-                    else //if they got it wrong 
-                    {
-
-                        //set the flash text
-                        _flashText.SetFlashText(string.Format("Incorrect, you number was {0}", actual), gameTime.TotalGameTime.TotalMilliseconds, true);
-
-                        //play the bad sound
-                        this.PlaySound(_incorrectSound, gameTime);
-
-                    }
-
-                }
-
-                //reset the equation
-                this._currentEquation = "";
-                this._undoEquations.Clear();
-                this._undoType.Clear();
-                this._selectedYXs.Clear();
-                this._selectedX = -1;
-                this._selectedY = -1;
-
-            }
+            //determine which input mode we should be in
+            if (_isPaused)
+                this.HandlePausedMove(gameTime, move);
+            else
+                this.HandleGameplayMove(gameTime, move);
 
             base.HandleMove(gameTime, move);
 
@@ -540,6 +354,16 @@ namespace EquationFinder.Screens
         #region Private Board Methods
 
         private void HandleDirection(Buttons direction)
+        {
+
+            if (_isPaused)
+                this.HandlePausedDirection(direction);
+            else
+                this.HandleGameplayDirection(direction);
+
+        }
+
+        private void HandleGameplayDirection(Buttons direction)
         {
 
             if (direction.HasFlag(Buttons.DPadDown) || direction.HasFlag(Buttons.LeftThumbstickDown))
@@ -574,6 +398,13 @@ namespace EquationFinder.Screens
                     this._currentX = 0;
 
             }
+
+        }
+
+        private void HandlePausedDirection(Buttons direction)
+        {
+            
+            //TODO: handle paused direction changes
 
         }
 
@@ -919,6 +750,222 @@ namespace EquationFinder.Screens
             this._selectedYXs.Clear();
             this._previouslySelectedYXs.Clear();
             this._selectedActionTypes.Clear();
+        }
+
+        private void HandleGameplayMove(GameTime gameTime, Move move)
+        {
+
+
+            if (move.Name == "Start")
+            {
+
+                if (!_isPaused)
+                {
+                    _isPaused = true;
+                }
+
+            }
+            else if (move.Name == "Undo")
+            {
+
+                //if we have previous equations to undo
+                if (_undoEquations.Count() > 0)
+                {
+
+                    //get if we have an undo number
+                    var undoType = _undoType[_undoType.Count() - 1];
+
+                    //if we have a number to undo
+                    if (undoType == "Number")
+                    {
+
+                        ////remove the most recent selected
+                        _selectedYXs.RemoveAt(_selectedYXs.Count() - 1);
+
+                        if (_selectedYXs.Count() > 0)
+                        {
+
+                            var crumbs = _selectedYXs[_selectedYXs.Count() - 1].Split(new char[] { ',' });
+                            _selectedY = Convert.ToInt32(crumbs[0]);
+                            _selectedX = Convert.ToInt32(crumbs[1]);
+
+
+                        }
+                        else
+                        {
+
+                            //update the selected values
+                            _selectedX = -1;
+                            _selectedY = -1;
+
+                        }
+
+                    }
+
+                    //get the previous equation
+                    var previousEquation = _undoEquations[_undoEquations.Count() - 1];
+
+                    //we used the previous equation so remove it
+                    _undoEquations.RemoveAt(_undoEquations.Count() - 1);
+                    _undoType.RemoveAt(_undoType.Count() - 1);
+                    _selectedActionTypes.RemoveAt(_selectedActionTypes.Count() - 1);
+
+                    //set the previous equation
+                    _currentEquation = previousEquation;
+
+
+
+
+                }
+
+            }
+            else if (move.Name == "Left Parenthesis")
+            {
+
+                if (this.IsValidLeftParenthesisMove(gameTime))
+                {
+
+                    //add the current equation to the list
+                    _undoEquations.Add(_currentEquation);
+                    _undoType.Add("Left Parenthesis");
+                    _selectedActionTypes.Add(ActionType.LEFT_PARENTHESIS);
+
+                    //update the equation
+                    _currentEquation += " (";
+                    _currentEquation = _currentEquation.Trim();
+
+                }
+
+            }
+            else if (move.Name == "Right Parenthesis")
+            {
+
+                if (this.IsValidRightParenthesisMove(gameTime))
+                {
+
+                    //add the current equation to the list
+                    _undoEquations.Add(_currentEquation);
+                    _undoType.Add("Right Parenthesis");
+                    _selectedActionTypes.Add(ActionType.RIGHT_PARENTHESIS);
+
+                    //update the equation
+                    _currentEquation += ")";
+
+                }
+
+            }
+
+            else if (move.Name == "A"
+                || move.Name == "B"
+                || move.Name == "X"
+                || move.Name == "Y")
+            {
+
+                this.AddOperation(gameTime, move);
+
+            }
+            else if (move.Name == "Select")
+            {
+                this.SelectNumber(gameTime, move);
+            }
+            else if (move.Name == "Evaluate")
+            {
+
+                //if we don't have a current equation, select the current number
+                if (String.IsNullOrWhiteSpace(_currentEquation.Trim(new char[] { '(', ')' })))
+                    return;
+
+                //create an expression for the current equation
+                Expression e = new Expression(this._currentEquation);
+
+                //if the equation has errors
+                if (e.HasErrors())
+                {
+
+                    //set the flash text
+                    _flashText.SetFlashText("Invalid equation", gameTime.TotalGameTime.TotalMilliseconds, true);
+
+                    //play the bad sound
+                    this.PlaySound(_incorrectSound, gameTime);
+
+                }
+                else //if we don't have any errors
+                {
+
+                    //get the value of the actual expression entered
+                    var actual = Convert.ToInt32(e.Evaluate());
+
+                    //if they got it right
+                    if (actual == _target)
+                    {
+
+                        //if they have used the equation previously
+                        if (UseEquationPreviously())
+                        {
+
+                            //set the flash text
+                            _flashText.SetFlashText("Already used that equation", gameTime.TotalGameTime.TotalMilliseconds, true);
+
+                            //play the bad sound
+                            this.PlaySound(_incorrectSound, gameTime);
+                        }
+                        else
+                        {
+
+                            //add the correct path to the previously used paths
+                            this._previouslySelectedYXs.Add(new List<string>());
+
+                            //add the YXs used in this equation
+                            foreach (var YX in _selectedYXs)
+                                this._previouslySelectedYXs[this._previouslySelectedYXs.Count - 1].Add(YX);
+
+                            //add time back to the clock
+                            _clock.AddTime(_secondForCorrectAnswer);
+
+                            //we got a correct answer, so we need to calculate the correct answer
+                            this.CalculateScore();
+                            this._totalCorrect++;
+                            this._roundCorrect++;
+
+                            //set the flash text
+                            _flashText.SetFlashText("Correct!", gameTime.TotalGameTime.TotalMilliseconds, true);
+
+                            //play the bad sound
+                            this.PlaySound(_correctSound, gameTime);
+
+                        }
+
+                    }
+                    else //if they got it wrong 
+                    {
+
+                        //set the flash text
+                        _flashText.SetFlashText(string.Format("Incorrect, you number was {0}", actual), gameTime.TotalGameTime.TotalMilliseconds, true);
+
+                        //play the bad sound
+                        this.PlaySound(_incorrectSound, gameTime);
+
+                    }
+
+                }
+
+                //reset the equation
+                this._currentEquation = "";
+                this._undoEquations.Clear();
+                this._undoType.Clear();
+                this._selectedYXs.Clear();
+                this._selectedX = -1;
+                this._selectedY = -1;
+
+            }
+
+        }
+
+        private void HandlePausedMove(GameTime gameTime, Move move)
+        {
+            
+            //TODO: Handle paused game logic here
+
         }
 
         #endregion
