@@ -200,93 +200,15 @@ namespace EquationFinder.Screens
             y = AddTextToList("If you get 4 or more equations correct you can move to the next number.", y, true, true);
             y = AddTextToList("Q: What do I get in the trail mode?", y, false, true);
             y = AddTextToList("You get to play the full game however to don't get to go to the next number when your round ends.", y, true, true);
-            y = AddTextToList("Q: Why does it start on 19?", y, false, true);
-            y = AddTextToList("Q: Why does it start on 19?", y, false, true);
-            y = AddTextToList("Q: Why does it start on 19?", y, false, true);
-            y = AddTextToList("Q: Why does it start on 19?", y, false, true);
-            y = AddTextToList("Q: Why does it start on 19?", y, false, true);
-
-  
-
-            ////add some text
-            //_screenText.Add(new ScreenText()
-            //{
-            //    Text = "A: ",
-            //    Vector = new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, y)
-            //});
-            //y += _gameFont.LineSpacing * 2;
-
-            ////add some text
-            //_screenText.Add(new ScreenText()
-            //{
-            //    Text = "Q: How are scores calculated?",
-            //    Vector = new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, y)
-            //});
-            //y += _gameFont.LineSpacing;
-
-            ////add some text
-            //_screenText.Add(new ScreenText()
-            //{
-            //    Text = "A: We count the number of numbers and operators, excluding parenthesis, and multiple that count by the target number.",
-            //    Vector = new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, y)
-            //});
-            //y += _gameFont.LineSpacing * 2;
-
-            ////add some text
-            //_screenText.Add(new ScreenText()
-            //{
-            //    Text = "Q: Can you show me an example?",
-            //    Vector = new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, y)
-            //});
-            //y += _gameFont.LineSpacing;
-
-            ////add some text
-            //_screenText.Add(new ScreenText()
-            //{
-            //    Text = "Say your target is 19 and your equations was (9 * 3) - 10 + 2.  There are 4 numbers and 3 operators which = 7.  7 * 19 = 133.",
-            //    Vector = new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, y)
-            //});
-            //y += _gameFont.LineSpacing * 2;
-
-            ////add some text
-            //_screenText.Add(new ScreenText()
-            //{
-            //    Text = "Q: What operators are allowed?",
-            //    Vector = new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, y)
-            //});
-            //y += _gameFont.LineSpacing;
-
-            ////add some text
-            //_screenText.Add(new ScreenText()
-            //{
-            //    Text = "Parentheses, Multiplication and Division, and Addition and Subtraction",
-            //    Vector = new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, y)
-            //});
-            //y += _gameFont.LineSpacing * 2;
-
-            ////add some text
-            //_screenText.Add(new ScreenText()
-            //{
-            //    Text = "Q: Why are the controls so odd?",
-            //    Vector = new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, y)
-            //});
-            //y += _gameFont.LineSpacing;
-
-            ////add some text
-            //_screenText.Add(new ScreenText()
-            //{
-            //    Text = "A: It is the best I could come up with.",
-            //    Vector = new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, y)
-            //});
-            //y += _gameFont.LineSpacing;
-
-            ////add some text
-            //_screenText.Add(new ScreenText()
-            //{
-            //    Text = "Email equationfinder@gmail.com with suggestions.",
-            //    Vector = new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, y)
-            //});
-            //y += _gameFont.LineSpacing;
+            y = AddTextToList("Q: How are scores calculated?", y, false, true);
+            y = AddTextToList("We count the number of numbers and operators, excluding parenthesis, and multiple that count by the target number.", y, true, true);
+            y = AddTextToList("Q: Can you show me an example?", y, false, true);
+            y = AddTextToList("Say your target is 19 and your equations was (9 * 3) - 10 + 2.", y, false, true);
+            y = AddTextToList("There are 4 numbers and 3 operators which equals 7.  7 * 19 = 133.", y, true, true);
+            y = AddTextToList("Q: What operators are allowed?", y, false, true);
+            y = AddTextToList("Parentheses, Multiplication and Division, and Addition and Subtraction.", y, true, true);
+            y = AddTextToList("Q: Why are the controls so odd?", y, false, true);
+            y = AddTextToList("It is the best I could come up with. Email equationfinder@gmail.com with suggestions.", y, true, true);
 
         }
 
