@@ -26,7 +26,7 @@ namespace EquationFinder
         ScreenManager screenManager;
 
         private IAsyncResult _asyncResult;
-        private bool _requestedStorageDevice, _asyncFinsihed, _loadedHighScores;
+        private bool _requestedStorageDevice, _asyncFinsihed;
         
         private static StorageDevice _storageDevice;
         public static StorageDevice StorageDevice { get { return _storageDevice; } }
@@ -58,7 +58,6 @@ namespace EquationFinder
             //reset the storage device settings
             this._requestedStorageDevice = false;
             this._asyncFinsihed = false;
-            this._loadedHighScores = false;
 
             // Activate the first screens.
             GameplayOptions.BoardSize = 5;

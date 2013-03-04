@@ -73,10 +73,13 @@ namespace EquationFinder.Screens
             if (hasHighScore)
                 _highScoreToEnter = _highScores.IndexOf(highScore);
 
+            //get the last initials that were saved
+            var initials = StorageHelper.LoadInitials();
+
             //set the default letters for the initials
-            _first = "A";
-            _second = "A"; 
-            _third = "A";
+            _first = initials[0].ToString();
+            _second = initials[1].ToString();
+            _third = initials[2].ToString();
 
             
         }
@@ -116,8 +119,8 @@ namespace EquationFinder.Screens
             //draw the background
             spriteBatch.Draw(_texture,
                 new Rectangle(
-                    ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X,
-                    ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y,
+                    ScreenManager.GraphicsDevice.Viewport.X,
+                    ScreenManager.GraphicsDevice.Viewport.Y,
                     ScreenManager.GraphicsDevice.Viewport.Width,
                     ScreenManager.GraphicsDevice.Viewport.Height), Color.White);
 
@@ -220,6 +223,7 @@ namespace EquationFinder.Screens
                     _highScores[_highScoreToEnter].Initials = string.Format("{0}{1}{2}", _first, _second, _third);
 
                     //save the new high scores
+                    StorageHelper.SaveInitials(_highScores[_highScoreToEnter].Initials);
                     StorageHelper.SaveHighScores(_highScores, _boardSize);
 
                 }
@@ -236,10 +240,10 @@ namespace EquationFinder.Screens
 
         #region Private Methods
 
-        private void HandleDirection(Buttons buttons)
+        private void HandleDirection(Buttons direction)
         {
 
-            if (buttons.HasFlag(Buttons.DPadLeft) || buttons.HasFlag(Buttons.LeftThumbstickLeft))
+            if (direction.Equals(Buttons.DPadLeft) || direction.Equals(Buttons.LeftThumbstickLeft))
             {
 
                 if (_letterNumber == 1)
@@ -250,7 +254,7 @@ namespace EquationFinder.Screens
                     _letterNumber = 2;
 
             }
-            else if (buttons.HasFlag(Buttons.DPadRight) || buttons.HasFlag(Buttons.LeftThumbstickRight))
+            else if (direction.Equals(Buttons.DPadRight) || direction.Equals(Buttons.LeftThumbstickRight))
             {
 
                 if (_letterNumber == 1)
@@ -261,8 +265,8 @@ namespace EquationFinder.Screens
                     _letterNumber = 1;
 
             }
-            else if (buttons.HasFlag(Buttons.DPadUp) || buttons.HasFlag(Buttons.LeftThumbstickUp)
-            || buttons.HasFlag(Buttons.DPadDown) || buttons.HasFlag(Buttons.LeftThumbstickDown))
+            else if (direction.Equals(Buttons.DPadUp) || direction.Equals(Buttons.LeftThumbstickUp)
+            || direction.Equals(Buttons.DPadDown) || direction.Equals(Buttons.LeftThumbstickDown))
             {
 
                 //get the letter we care about
@@ -276,7 +280,7 @@ namespace EquationFinder.Screens
                 var letterIndex = _availableCharacters.IndexOf(letter);
 
                 //get the next letter
-                if (buttons.HasFlag(Buttons.DPadUp) || buttons.HasFlag(Buttons.LeftThumbstickUp))
+                if (direction.Equals(Buttons.DPadUp) || direction.Equals(Buttons.LeftThumbstickUp))
                 {
 
                     //increase the letter by one

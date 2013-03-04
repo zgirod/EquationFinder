@@ -19,6 +19,90 @@ namespace EquationFinder.Helpers
             return string.Format("HighScores{0}.txt", boardSize);
         }
 
+        public static void SaveInitials(string initials)
+        {
+
+            var fileName = "Initials.txt";
+
+            // Open a storage container.
+            IAsyncResult result = EquationFinderGame.StorageDevice.BeginOpenContainer("EquationFinder", null, null);
+
+            // Wait for the WaitHandle to become signaled.
+            result.AsyncWaitHandle.WaitOne();
+
+            StorageContainer container = EquationFinderGame.StorageDevice.EndOpenContainer(result);
+
+            // Close the wait handle.
+            result.AsyncWaitHandle.Close();
+
+            //if we have a file, delete it
+            if (container.FileExists(fileName))
+                container.DeleteFile(fileName);
+
+            // Create a new file.
+            if (!container.FileExists(fileName))
+            {
+                Stream file = container.CreateFile(fileName);
+
+                using (StreamWriter sw = new StreamWriter(file))
+                {
+
+                    sw.WriteLine(initials);
+
+                }
+
+                file.Close();
+            }
+
+            // Dispose the container, to commit the data.
+            container.Dispose();
+        }
+
+        public static string LoadInitials()
+        {
+
+            var initials = "AAA";
+            var fileName = "Initials.txt";
+
+            // Open a storage container.
+            IAsyncResult result = EquationFinderGame.StorageDevice.BeginOpenContainer("EquationFinder", null, null);
+
+            // Wait for the WaitHandle to become signaled.
+            result.AsyncWaitHandle.WaitOne();
+
+            StorageContainer container = EquationFinderGame.StorageDevice.EndOpenContainer(result);
+
+            // Close the wait handle.
+            result.AsyncWaitHandle.Close();
+
+            // if we have a file
+            if (container.FileExists(fileName))
+            {
+
+                //open the file
+                Stream file = container.OpenFile(fileName, FileMode.Open);
+
+                //loop through each file
+                using (StreamReader sr = new StreamReader(file))
+                {
+                    while (!sr.EndOfStream)
+                    {
+                        initials = sr.ReadLine();
+                    }
+                }
+
+                //close the file
+                file.Close();
+
+            }
+
+            // Dispose the container, to commit the data.
+            container.Dispose();
+
+            return initials;
+
+        }
+
         public static void SaveGameSettings()
         {
 

@@ -79,8 +79,8 @@ namespace EquationFinder.Screens
             //draw the background
             spriteBatch.Draw(_texture,
                 new Rectangle(
-                    ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X,
-                    ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y,
+                    ScreenManager.GraphicsDevice.Viewport.X,
+                    ScreenManager.GraphicsDevice.Viewport.Y,
                     ScreenManager.GraphicsDevice.Viewport.Width,
                     ScreenManager.GraphicsDevice.Viewport.Height), Color.White);
 
@@ -150,10 +150,10 @@ namespace EquationFinder.Screens
 
         #region Private Methods
 
-        private void HandleDirection(Buttons buttons)
+        private void HandleDirection(Buttons direction)
         {
 
-            if ((buttons.HasFlag(Buttons.DPadUp) || buttons.HasFlag(Buttons.LeftThumbstickUp))
+            if ((direction.Equals(Buttons.DPadUp) || direction.Equals(Buttons.LeftThumbstickUp))
                 && (_y <= 0))
             {
 
@@ -167,7 +167,7 @@ namespace EquationFinder.Screens
                 _y++;
 
             }
-            else if ((buttons.HasFlag(Buttons.DPadDown) || buttons.HasFlag(Buttons.LeftThumbstickDown))
+            else if ((direction.Equals(Buttons.DPadDown) || direction.Equals(Buttons.LeftThumbstickDown))
                 && (_y >= -1000))
             {
 
@@ -232,7 +232,7 @@ namespace EquationFinder.Screens
                 bool first = true;
 
                 //while we have new text to add
-                while (!string.IsNullOrWhiteSpace(newText))
+                while (!string.IsNullOrEmpty(newText))
                 {
 
                     //go to the next line
@@ -263,7 +263,7 @@ namespace EquationFinder.Screens
 
                         int j = newText.Length - 1;
                         var newChar = newText[j].ToString();
-                        while (!string.IsNullOrWhiteSpace(newChar) && j > 0)
+                        while (!string.IsNullOrEmpty(newChar.Trim()) && j > 0)
                         {
 
                             j--;

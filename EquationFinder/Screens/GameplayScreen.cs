@@ -7,8 +7,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework;
-using System.Numerics;
-using NCalc;
+//using System.Numerics;
+//using NCalc;
 using EquationFinder.Helpers;
 using EquationFinder.Input;
 using EquationFinder.DomainLogic;
@@ -159,15 +159,15 @@ namespace EquationFinder.Screens
                 //draw the background
                 spriteBatch.Draw(_texture,
                     new Rectangle(
-                        ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X,
-                        ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y,
+                        ScreenManager.GraphicsDevice.Viewport.X,
+                        ScreenManager.GraphicsDevice.Viewport.Y,
                         ScreenManager.GraphicsDevice.Viewport.Width,
                         ScreenManager.GraphicsDevice.Viewport.Height), Color.White);
 
                 // Draw the score
-                spriteBatch.DrawString(_gameFont, "Target: " + _target, new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y), Color.Black);
-                spriteBatch.DrawString(_gameFont, "Equation: " + _currentEquation, new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y + 30), Color.Black);
-                spriteBatch.DrawString(_gameFont, "Score: " + string.Format("{0:n0}", this._score), new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y + 60), Color.Black);
+                spriteBatch.DrawString(_gameFont, "Target: " + _target, new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 10, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y), Color.Black);
+                spriteBatch.DrawString(_gameFont, "Equation: " + _currentEquation, new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 10, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y + 30), Color.Black);
+                spriteBatch.DrawString(_gameFont, "Score: " + string.Format("{0:n0}", this._score), new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 10, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y + 60), Color.Black);
 
                 //get the time string
                 var time = "Time:   " + _clock.displayClock;
@@ -366,7 +366,8 @@ namespace EquationFinder.Screens
         private void HandleGameplayDirection(Buttons direction)
         {
 
-            if (direction.HasFlag(Buttons.DPadDown) || direction.HasFlag(Buttons.LeftThumbstickDown))
+            if (direction.Equals(Buttons.DPadDown)
+                || direction.Equals(Buttons.LeftThumbstickDown))
             {
 
                 this._currentY++;
@@ -374,7 +375,7 @@ namespace EquationFinder.Screens
                     this._currentY = 0;
 
             }
-            else if (direction.HasFlag(Buttons.DPadLeft) || direction.HasFlag(Buttons.LeftThumbstickLeft))
+            else if (direction.Equals(Buttons.DPadLeft) || direction.Equals(Buttons.LeftThumbstickLeft))
             {
 
                 this._currentX--;
@@ -382,7 +383,7 @@ namespace EquationFinder.Screens
                     this._currentX = this._boardSize - 1;
 
             }
-            else if (direction.HasFlag(Buttons.DPadUp) || direction.HasFlag(Buttons.LeftThumbstickUp))
+            else if (direction.Equals(Buttons.DPadUp) || direction.Equals(Buttons.LeftThumbstickUp))
             {
 
                 this._currentY--;
@@ -390,7 +391,7 @@ namespace EquationFinder.Screens
                     this._currentY = this._boardSize - 1;
 
             }
-            else if (direction.HasFlag(Buttons.DPadRight) || direction.HasFlag(Buttons.LeftThumbstickRight))
+            else if (direction.Equals(Buttons.DPadRight) || direction.Equals(Buttons.LeftThumbstickRight))
             {
 
                 this._currentX++;
@@ -483,7 +484,7 @@ namespace EquationFinder.Screens
                 var currentValue = this._gameBoardValues[_currentY, _currentX].ToString();
 
                 //add the currentValue to our equation
-                if (String.IsNullOrWhiteSpace(_currentEquation))
+                if (String.IsNullOrEmpty(_currentEquation))
                     this._currentEquation = currentValue;
                 else
                     this._currentEquation += string.Format(" {0}", currentValue);
@@ -727,7 +728,7 @@ namespace EquationFinder.Screens
                     {
 
                         //count each one found
-                        if (_selectedYXs.Exists(x => x == YX))
+                        if (_selectedYXs.FirstOrDefault(x => x == YX) != null)
                             countFound++;
 
                     }
@@ -872,14 +873,14 @@ namespace EquationFinder.Screens
             {
 
                 //if we don't have a current equation, select the current number
-                if (String.IsNullOrWhiteSpace(_currentEquation.Trim(new char[] { '(', ')' })))
+                if (String.IsNullOrEmpty(_currentEquation.Trim(new char[] { '(', ')' })))
                     return;
 
                 //create an expression for the current equation
-                Expression e = new Expression(this._currentEquation);
+                //Expression e = new Expression(this._currentEquation);
 
                 //if the equation has errors
-                if (e.HasErrors())
+                if (false)
                 {
 
                     //set the flash text
@@ -893,7 +894,8 @@ namespace EquationFinder.Screens
                 {
 
                     //get the value of the actual expression entered
-                    var actual = Convert.ToInt32(e.Evaluate());
+                    //var actual = Convert.ToInt32(e.Evaluate());
+                    var actual = 19;
 
                     //if they got it right
                     if (actual == _target)

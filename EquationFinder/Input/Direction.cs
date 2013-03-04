@@ -11,10 +11,14 @@ namespace EquationFinder.Input
     {
         // Helper bit masks for directions defined with the Buttons flags enum.
         public const Buttons None = 0;
-        public const Buttons Up = Buttons.DPadUp | Buttons.LeftThumbstickUp;
-        public const Buttons Down = Buttons.DPadDown | Buttons.LeftThumbstickDown;
-        public const Buttons Left = Buttons.DPadLeft | Buttons.LeftThumbstickLeft;
-        public const Buttons Right = Buttons.DPadRight | Buttons.LeftThumbstickRight;
+        //public const Buttons Up = Buttons.DPadUp | Buttons.LeftThumbstickUp;
+        //public const Buttons Down = Buttons.DPadDown | Buttons.LeftThumbstickDown;
+        //public const Buttons Left = Buttons.DPadLeft | Buttons.LeftThumbstickLeft;
+        //public const Buttons Right = Buttons.DPadRight | Buttons.LeftThumbstickRight;
+        public const Buttons Up = Buttons.DPadUp;
+        public const Buttons Down = Buttons.DPadDown;
+        public const Buttons Left = Buttons.DPadLeft;
+        public const Buttons Right = Buttons.DPadRight;
         public const Buttons UpLeft = Up | Left;
         public const Buttons UpRight = Up | Right;
         public const Buttons DownLeft = Down | Left;

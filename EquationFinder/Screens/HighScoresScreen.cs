@@ -72,8 +72,8 @@ namespace EquationFinder.Screens
             //draw the background
             spriteBatch.Draw(_texture,
                 new Rectangle(
-                    ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X,
-                    ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y,
+                    ScreenManager.GraphicsDevice.Viewport.X,
+                    ScreenManager.GraphicsDevice.Viewport.Y,
                     ScreenManager.GraphicsDevice.Viewport.Width,
                     ScreenManager.GraphicsDevice.Viewport.Height), Color.White);
 
@@ -151,10 +151,10 @@ namespace EquationFinder.Screens
 
         #region Private Methods
 
-        private void HandleDirection(Buttons buttons)
+        private void HandleDirection(Buttons direction)
         {
 
-            if (buttons.HasFlag(Buttons.DPadLeft) || buttons.HasFlag(Buttons.LeftThumbstickLeft))
+            if (direction.Equals(Buttons.DPadLeft) || direction.Equals(Buttons.LeftThumbstickLeft))
             {
 
                 if (_boardSize == 5)
@@ -167,7 +167,7 @@ namespace EquationFinder.Screens
                     _boardSize = 7;
 
             }
-            else if (buttons.HasFlag(Buttons.DPadRight) || buttons.HasFlag(Buttons.LeftThumbstickRight))
+            else if (direction.Equals(Buttons.DPadRight) || direction.Equals(Buttons.LeftThumbstickRight))
             {
 
                 if (_boardSize == 5)

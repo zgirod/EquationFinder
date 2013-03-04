@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Security.Cryptography;
-using System.Numerics;
+using EquationFinder.Helpers;
+//using System.Security.Cryptography;
 
 namespace EquationFinder.DomainLogic
 {
     public static class BoardLogic
     {
 
-        public static int[,] CreateBoard(int boardSize, BigInteger hashKey)
+        public static int[,] CreateBoard(int boardSize, BigInt hashKey)
         {
 
             //create the board
@@ -22,7 +22,7 @@ namespace EquationFinder.DomainLogic
             {
 
                 //get the number for this cell
-                var cellNumber = Convert.ToInt32(BigInteger.Remainder(hashKey, new BigInteger(10)).ToString());
+                var cellNumber = Convert.ToInt32(hashKey.ToString().Substring(hashKey.ToString().Length - 1, 1));
                 if (cellNumber == 0)
                     cellNumber = 10;
 
@@ -40,7 +40,7 @@ namespace EquationFinder.DomainLogic
                 }
 
                 //get the next value in the has key
-                hashKey = BigInteger.Divide(hashKey, new BigInteger(10));
+                hashKey = BigInt.Divide(hashKey, BigInt.Parse("10"));
 
                 //did another row
                 count++;
@@ -64,26 +64,35 @@ namespace EquationFinder.DomainLogic
 
         }
 
-        private static BigInteger RandomHash(int number)
+        private static BigInt RandomHash(int number)
         {
 
-            var factorial = new BigInteger(number);
-            number--;
-            for (; number > 1; number--)
-                factorial = factorial * number;
+            var factorial = Factorial(BigInt.Parse(number.ToString()));
 
             //get a random number
-            var rng = new RNGCryptoServiceProvider();
-            byte[] bytes = factorial.ToByteArray();
-            rng.GetBytes(bytes);
+            //var rng = new RNGCryptoServiceProvider();
+            //byte[] bytes = factorial.ToByteArray();
+            //string sadfasdf = "Asdf";
+            //rng.GetBytes(bytes);
 
-            BigInteger hashKey = new BigInteger(bytes);
-            if (hashKey < 0)
-                hashKey = hashKey * -1;
+            //BigInteger hashKey = new BigInteger(bytes);
+            //if (hashKey < 0)
+            //    hashKey = hashKey * -1;
 
-            return hashKey;
+            //return hashKey;
+
+            return BigInt.Parse("1234590328745932750913048572034985");
 
 
+        }
+
+        static BigInt Factorial(BigInt n)
+        {
+            if (n < 0)
+            {
+                throw new ArgumentException("Can't calculate for negative number.", "n");
+            }
+            return n == 0 ? 1 : n * Factorial(n - 1);
         }
 
     }

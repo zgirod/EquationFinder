@@ -128,10 +128,10 @@ namespace EquationFinder.Screens
             OnCancel();
         }
 
-        private void HandleDirection(Buttons buttons)
+        private void HandleDirection(Buttons direction)
         {
 
-            if (buttons.HasFlag(Buttons.DPadUp) || buttons.HasFlag(Buttons.LeftThumbstickUp))
+            if (direction.Equals(Buttons.DPadUp) || direction.Equals(Buttons.LeftThumbstickUp))
             {
 
                 selectedEntry--;
@@ -140,7 +140,7 @@ namespace EquationFinder.Screens
                     selectedEntry = menuEntries.Count - 1;
 
             }
-            else if (buttons.HasFlag(Buttons.DPadDown) || buttons.HasFlag(Buttons.LeftThumbstickDown))
+            else if (direction.Equals(Buttons.DPadDown) || direction.Equals(Buttons.LeftThumbstickDown))
             {
 
 
