@@ -10,19 +10,19 @@ namespace EquationFinder.DomainLogic
     public static class BoardLogic
     {
 
-        public static int[,] CreateBoard(int boardSize, BigInt hashKey)
+        public static int[,] CreateBoard(int boardSize, string boardValues)
         {
 
             //create the board
             var board = new int[boardSize, boardSize];
 
             var totalSize = boardSize * boardSize;
-            int count = 1, row = 0, col = 0;
+            int count = 1, row = 0, col = 0, i = 0;
             do
             {
 
                 //get the number for this cell
-                var cellNumber = Convert.ToInt32(hashKey.ToString().Substring(hashKey.ToString().Length - 1, 1));
+                var cellNumber = Convert.ToInt32(boardValues[i].ToString());
                 if (cellNumber == 0)
                     cellNumber = 10;
 
@@ -39,11 +39,9 @@ namespace EquationFinder.DomainLogic
                     row++;
                 }
 
-                //get the next value in the has key
-                hashKey = BigInt.Divide(hashKey, BigInt.Parse("10"));
-
                 //did another row
                 count++;
+                i++;
 
             }
             while (count <= totalSize);
@@ -64,36 +62,17 @@ namespace EquationFinder.DomainLogic
 
         }
 
-        private static BigInt RandomHash(int number)
+        private static string RandomHash(int number)
         {
 
-            var factorial = Factorial(BigInt.Parse(number.ToString()));
-
-            //get a random number
-            //var rng = new RNGCryptoServiceProvider();
-            //byte[] bytes = factorial.ToByteArray();
-            //string sadfasdf = "Asdf";
-            //rng.GetBytes(bytes);
-
-            //BigInteger hashKey = new BigInteger(bytes);
-            //if (hashKey < 0)
-            //    hashKey = hashKey * -1;
-
-            //return hashKey;
-
-            return BigInt.Parse("1234590328745932750913048572034985");
-
-
-        }
-
-        static BigInt Factorial(BigInt n)
-        {
-            if (n < 0)
-            {
-                throw new ArgumentException("Can't calculate for negative number.", "n");
-            }
-            return n == 0 ? 1 : n * Factorial(n - 1);
+            var boardValues = "";
+            var random = new Random();
+            for(int i = 0; i <= number; i++)
+                boardValues += random.Next(0, 10);
+            return boardValues;
+            
         }
 
     }
+
 }

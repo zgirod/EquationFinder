@@ -7,8 +7,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework;
-//using System.Numerics;
-//using NCalc;
 using EquationFinder.Helpers;
 using EquationFinder.Input;
 using EquationFinder.DomainLogic;
@@ -165,9 +163,9 @@ namespace EquationFinder.Screens
                         ScreenManager.GraphicsDevice.Viewport.Height), Color.White);
 
                 // Draw the score
-                spriteBatch.DrawString(_gameFont, "Target: " + _target, new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 10, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y), Color.Black);
-                spriteBatch.DrawString(_gameFont, "Equation: " + _currentEquation, new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 10, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y + 30), Color.Black);
-                spriteBatch.DrawString(_gameFont, "Score: " + string.Format("{0:n0}", this._score), new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 10, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y + 60), Color.Black);
+                spriteBatch.DrawString(_gameFont, "Target: " + _target, new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 10, ScreenManager.GraphicsDevice.Viewport.Y), Color.Black);
+                spriteBatch.DrawString(_gameFont, "Equation: " + _currentEquation, new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 10, ScreenManager.GraphicsDevice.Viewport.Y + 30), Color.Black);
+                spriteBatch.DrawString(_gameFont, "Score: " + string.Format("{0:n0}", this._score), new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 10, ScreenManager.GraphicsDevice.Viewport.Y + 60), Color.Black);
 
                 //get the time string
                 var time = "Time:   " + _clock.displayClock;
@@ -177,7 +175,7 @@ namespace EquationFinder.Screens
                 //draw the space need for the time string
                 Vector2 timeSize = _gameFont.MeasureString(time);
                 spriteBatch.DrawString(_gameFont, time, new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Width - timeSize.X - 10,
-                    ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y), Color.Black);
+                    ScreenManager.GraphicsDevice.Viewport.Y), Color.Black);
 
                 int row = 0, col = 0;
                 while (row < this._boardSize)
@@ -876,11 +874,21 @@ namespace EquationFinder.Screens
                 if (String.IsNullOrEmpty(_currentEquation.Trim(new char[] { '(', ')' })))
                     return;
 
-                //create an expression for the current equation
-                //Expression e = new Expression(this._currentEquation);
+                //get the result for the current equation
+                decimal result = 0.0m;
+                bool invalidEquation = false;
+                try
+                {
+                    result = Parser.ParseEquation(_currentEquation);
+                }
+                catch
+                {
+                    invalidEquation = true;
+                }
+                
 
                 //if the equation has errors
-                if (false)
+                if (invalidEquation)
                 {
 
                     //set the flash text
@@ -894,8 +902,7 @@ namespace EquationFinder.Screens
                 {
 
                     //get the value of the actual expression entered
-                    //var actual = Convert.ToInt32(e.Evaluate());
-                    var actual = 19;
+                    var actual = Convert.ToInt32(result);
 
                     //if they got it right
                     if (actual == _target)

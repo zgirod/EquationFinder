@@ -67,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DomainLogic\BoardLogic.cs" />
+    <Compile Include="DomainLogic\Parser.cs" />
     <Compile Include="EquationFinderGame.cs" />
     <Compile Include="Helpers\BigInt.cs" />
     <Compile Include="Helpers\ClockTimer.cs" />
