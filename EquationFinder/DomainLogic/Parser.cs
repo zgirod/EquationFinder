@@ -16,7 +16,7 @@ namespace EquationFinder.DomainLogic
         {
 
             //set the equation
-            equation = equation.Replace(" ", "").Trim(); ;
+            equation = equation.Replace(" ", "").Trim();
 
             //parse out the equation
             equation = Parser.ProcessParenthesis(equation);

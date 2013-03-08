@@ -210,14 +210,29 @@ namespace EquationFinder.Screens
 
                     //calculate where the flash text goes
                     Vector2 textSize = _gameFont.MeasureString(_flashText.Text);
-                    Vector2 textCenter = new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, 50f);
 
                     //draw the flash text
-                    spriteBatch.DrawString(
-                        _gameFont,
-                        _flashText.Text,
-                        textCenter - (textSize / 2),
-                        Color.DarkBlue);
+                    if (_flashText.IsErrorText)
+                    {
+
+                        spriteBatch.DrawString(
+                            _gameFont,
+                            _flashText.Text,
+                            new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, ScreenManager.GraphicsDevice.Viewport.Height - 50f) - (textSize / 2),
+                            Color.Red);
+
+                    }
+                    else
+                    {
+
+                        spriteBatch.DrawString(
+                            _gameFont,
+                            _flashText.Text,
+                            new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, 50f) - (textSize / 2),
+                            Color.DarkBlue);
+
+                    }
+                    
 
                 }
 
@@ -457,81 +472,129 @@ namespace EquationFinder.Screens
             //if we don't have any equation select the number
             //if (string.IsNullOrWhiteSpace(_currentEquation))
             //{
-            //    this.SelectNumber(gameTime);
+                
             //}
 
-            //if we are on an operator and the button pressed is A, cycle through the controls
-            if (move.Name == "A" && (_selectedActionTypes.Count > 0 && _selectedActionTypes[_selectedActionTypes.Count() - 1] == ActionType.OPERATOR))
+
+            //if we are on the letter A
+            if (move.Name == "A")
             {
 
-                //get the current operator
-                var currentOperator = _currentEquation[_currentEquation.Length - 1].ToString();
+                //if we dont have a current equation OR if we are not on the previously selected
+                if (string.IsNullOrWhiteSpace(_currentEquation)
+                    || _currentX != _selectedX 
+                    || _currentY != _selectedY)
+                {
 
-                //get the new operator
-                var newOperator = "-";
-                if (currentOperator == "-")
-                {
-                    newOperator = "*";
-                }
-                else if (currentOperator == "*")
-                {
-                    newOperator = "/";
-                }
-                else if (currentOperator == "/")
-                {
-                    newOperator = "+";
+                    //select the current number
+                    this.SelectNumber(gameTime);
+
                 }
 
-                //set the new equation
-                _currentEquation = _currentEquation.Substring(0, _currentEquation.Length - 1) + newOperator;
-
-                //play success sound
-                this.PlaySound(_correctSound, gameTime);
-
-            }
-            else if (_selectedActionTypes.Count > 0 && _selectedActionTypes[_selectedActionTypes.Count() - 1] == ActionType.OPERATOR)
-            {
-
-                string newOperator = "-";
-                if (move.Name == "X")
+                    //if the previous equation was an operator, cycle through the operator
+                else if (_selectedActionTypes.Count > 0 && _selectedActionTypes[_selectedActionTypes.Count() - 1] == ActionType.OPERATOR
+                    && _currentX == _selectedX
+                    && _currentY == _selectedY)
                 {
-                    newOperator = "*";
+
+                    //cycle through the operators
+                    this.CycleThroughOperators(gameTime);
+
                 }
-                else if (move.Name == "Y")
+                else if (_selectedActionTypes.Count > 0 && _selectedActionTypes[_selectedActionTypes.Count() - 1] == ActionType.NUMBER
+                    && _currentX == _selectedX
+                    && _currentY == _selectedY)
                 {
-                    newOperator = "/";
+
+                    this.SelectNewOperator(move, gameTime);
+
                 }
-
-                //set the new equation
-                _currentEquation = _currentEquation.Substring(0, _currentEquation.Length - 1) + newOperator;
-
-                //play success sound
-                this.PlaySound(_correctSound, gameTime);
 
             }
 
-            //if we have a valid move
-            else if (IsValidOperationMove(gameTime))
+            //if hit B
+            else if (move.Name == "B")
             {
 
-                //add the current equation to the list
-                _undoEquations.Add(_currentEquation);
-                _undoType.Add("Operation");
-                _selectedActionTypes.Add(ActionType.OPERATOR);
+                //if we dont have a current equation OR if we are not on the previously selected
+                if (string.IsNullOrWhiteSpace(_currentEquation))
+                {
 
-                //get the arithmetic symbol
-                var symbol = "+";
-                if (move.Name == "X")
-                    symbol = "*";
-                else if (move.Name == "B")
-                    symbol = "-";
-                else if (move.Name == "Y")
-                    symbol = "/";
+                    //play error sound
+                    this.PlaySound(_incorrectSound, gameTime);
 
-                //add the symbol
-                _currentEquation += string.Format(" {0}", symbol);
+                    //set the flash text
+                    this._flashText.SetFlashText("You must select a number first", gameTime.TotalGameTime.TotalSeconds, true, true);
+
+                }
+
+                    //if the previous equation was an operator, cycle through the operator
+                else if (_selectedActionTypes.Count > 0 && _selectedActionTypes[_selectedActionTypes.Count() - 1] == ActionType.OPERATOR)
+                {
+
+                    //cycle through the operators
+                    this.CycleThroughOperators(gameTime);
+
+                }
+                else if (_selectedActionTypes.Count > 0 && _selectedActionTypes[_selectedActionTypes.Count() - 1] == ActionType.NUMBER)
+                {
+
+                    this.SelectNewOperator(move, gameTime);
+
+                }
 
             }
+
+            //if we selected X or Y
+            if (move.Name == "X" || move.Name == "Y")
+            {
+
+                //evaluate the equation
+                this.EvaulateEquation(gameTime);
+
+            }
+
+        }
+
+        private void SelectNewOperator(Move move, GameTime gameTime)
+        {
+
+            //add the current equation to the list
+            _undoEquations.Add(_currentEquation);
+            _undoType.Add("Operation");
+            _selectedActionTypes.Add(ActionType.OPERATOR);
+
+            //add the symbol
+            _currentEquation += string.Format(" +");
+
+        }
+
+        private void CycleThroughOperators(GameTime gameTime)
+        {
+
+            //get the current operator
+            var currentOperator = _currentEquation[_currentEquation.Length - 1].ToString();
+
+            //get the new operator
+            var newOperator = "-";
+            if (currentOperator == "-")
+            {
+                newOperator = "*";
+            }
+            else if (currentOperator == "*")
+            {
+                newOperator = "/";
+            }
+            else if (currentOperator == "/")
+            {
+                newOperator = "+";
+            }
+
+            //set the new equation
+            _currentEquation = _currentEquation.Substring(0, _currentEquation.Length - 1) + newOperator;
+
+            //play success sound
+            this.PlaySound(_correctSound, gameTime);
 
         }
 
@@ -562,6 +625,15 @@ namespace EquationFinder.Screens
 
                 //add the values to the previously selected list
                 _selectedYXs.Add(string.Format("{0},{1}", _currentY, _currentX));
+
+            }
+            else
+            {
+
+                //TODO: Beef up error message, already selected number, numbers must connect
+
+                //set the flash text
+                this._flashText.SetFlashText("You must select an operator first", gameTime.TotalGameTime.TotalMilliseconds, true, true);
 
             }
 
@@ -939,103 +1011,111 @@ namespace EquationFinder.Screens
             else if (move.Name == "Evaluate")
             {
 
-                //if we don't have a current equation, select the current number
-                if (String.IsNullOrEmpty(_currentEquation.Trim(new char[] { '(', ')' })))
-                    return;
+                //evaluate the equation
+                this.EvaulateEquation(gameTime);
 
-                //get the result for the current equation
-                decimal result = 0.0m;
-                bool invalidEquation = false;
-                try
-                {
-                    result = Parser.ParseEquation(_currentEquation);
-                }
-                catch
-                {
-                    invalidEquation = true;
-                }
-                
+            }
 
-                //if the equation has errors
-                if (invalidEquation)
+        }
+
+        private void EvaulateEquation(GameTime gameTime)
+        {
+
+            //if we don't have a current equation, select the current number
+            if (String.IsNullOrEmpty(_currentEquation.Trim(new char[] { '(', ')' })))
+                return;
+
+            //get the result for the current equation
+            decimal result = 0.0m;
+            bool invalidEquation = false;
+            try
+            {
+                result = Parser.ParseEquation(_currentEquation);
+            }
+            catch
+            {
+                invalidEquation = true;
+            }
+
+
+            //if the equation has errors
+            if (invalidEquation)
+            {
+
+                //set the flash text
+                _flashText.SetFlashText("Invalid equation", gameTime.TotalGameTime.TotalMilliseconds, true, false);
+
+                //play the bad sound
+                this.PlaySound(_incorrectSound, gameTime);
+
+            }
+            else //if we don't have any errors
+            {
+
+                //get the value of the actual expression entered
+                var actual = Convert.ToInt32(result);
+
+                //if they got it right
+                if (actual == _target)
+                {
+
+                    //if they have used the equation previously
+                    if (UseEquationPreviously())
+                    {
+
+                        //set the flash text
+                        _flashText.SetFlashText("Already used that equation", gameTime.TotalGameTime.TotalMilliseconds, true, false);
+
+                        //play the bad sound
+                        this.PlaySound(_incorrectSound, gameTime);
+                    }
+                    else
+                    {
+
+                        //add the correct path to the previously used paths
+                        this._previouslySelectedYXs.Add(new List<string>());
+
+                        //add the YXs used in this equation
+                        foreach (var YX in _selectedYXs)
+                            this._previouslySelectedYXs[this._previouslySelectedYXs.Count - 1].Add(YX);
+
+                        //add time back to the clock
+                        _clock.AddTime(_secondForCorrectAnswer);
+
+                        //we got a correct answer, so we need to calculate the correct answer
+                        this.CalculateScore();
+                        this._totalCorrect++;
+                        this._roundCorrect++;
+
+                        //set the flash text
+                        _flashText.SetFlashText("Correct!", gameTime.TotalGameTime.TotalMilliseconds, true, false);
+
+                        //play the bad sound
+                        this.PlaySound(_correctSound, gameTime);
+
+                    }
+
+                }
+                else //if they got it wrong 
                 {
 
                     //set the flash text
-                    _flashText.SetFlashText("Invalid equation", gameTime.TotalGameTime.TotalMilliseconds, true);
+                    _flashText.SetFlashText(string.Format("Incorrect, you number was {0}", actual), gameTime.TotalGameTime.TotalMilliseconds, true, false);
 
                     //play the bad sound
                     this.PlaySound(_incorrectSound, gameTime);
 
                 }
-                else //if we don't have any errors
-                {
-
-                    //get the value of the actual expression entered
-                    var actual = Convert.ToInt32(result);
-
-                    //if they got it right
-                    if (actual == _target)
-                    {
-
-                        //if they have used the equation previously
-                        if (UseEquationPreviously())
-                        {
-
-                            //set the flash text
-                            _flashText.SetFlashText("Already used that equation", gameTime.TotalGameTime.TotalMilliseconds, true);
-
-                            //play the bad sound
-                            this.PlaySound(_incorrectSound, gameTime);
-                        }
-                        else
-                        {
-
-                            //add the correct path to the previously used paths
-                            this._previouslySelectedYXs.Add(new List<string>());
-
-                            //add the YXs used in this equation
-                            foreach (var YX in _selectedYXs)
-                                this._previouslySelectedYXs[this._previouslySelectedYXs.Count - 1].Add(YX);
-
-                            //add time back to the clock
-                            _clock.AddTime(_secondForCorrectAnswer);
-
-                            //we got a correct answer, so we need to calculate the correct answer
-                            this.CalculateScore();
-                            this._totalCorrect++;
-                            this._roundCorrect++;
-
-                            //set the flash text
-                            _flashText.SetFlashText("Correct!", gameTime.TotalGameTime.TotalMilliseconds, true);
-
-                            //play the bad sound
-                            this.PlaySound(_correctSound, gameTime);
-
-                        }
-
-                    }
-                    else //if they got it wrong 
-                    {
-
-                        //set the flash text
-                        _flashText.SetFlashText(string.Format("Incorrect, you number was {0}", actual), gameTime.TotalGameTime.TotalMilliseconds, true);
-
-                        //play the bad sound
-                        this.PlaySound(_incorrectSound, gameTime);
-
-                    }
-
-                }
-
-                //reset the equation
-                this._currentEquation = "";
-                this._undoEquations.Clear();
-                this._undoType.Clear();
-                this._selectedYXs.Clear();
-                this._selectedX = -1;
-                this._selectedY = -1;
 
             }
+
+            //reset the equation
+            this._currentEquation = "";
+            this._undoEquations.Clear();
+            this._undoType.Clear();
+            this._selectedYXs.Clear();
+            this._selectedX = -1;
+            this._selectedY = -1;
 
         }
 
@@ -1043,6 +1123,15 @@ namespace EquationFinder.Screens
         {
             
             //TODO: Handle paused game logic here
+            if (move.Name == "Start")
+            {
+
+                if (_isPaused)
+                {
+                    _isPaused = false;
+                }
+
+            }
 
         }
 

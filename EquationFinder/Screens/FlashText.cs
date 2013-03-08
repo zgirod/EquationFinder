@@ -12,13 +12,15 @@ namespace EquationFinder.Screens
         public string Text;
         public double StartTime;
         public bool RunClock;
+        public bool IsErrorText;
 
-        public void SetFlashText(string text, double startTime, bool runClock) 
+        public void SetFlashText(string text, double startTime, bool runClock, bool isErrorText) 
         {
             this.Active = true;
             this.Text = text;
             this.StartTime = startTime;
             this.RunClock = runClock;
+            this.IsErrorText = isErrorText;
         }
 
     }
