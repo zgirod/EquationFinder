@@ -461,7 +461,7 @@ namespace EquationFinder.Screens
             //}
 
             //if we are on an operator and the button pressed is A, cycle through the controls
-            else if (move.Name == "A" && (_selectedActionTypes.Count > 0 && _selectedActionTypes[_selectedActionTypes.Count() - 1] == ActionType.OPERATOR))
+            if (move.Name == "A" && (_selectedActionTypes.Count > 0 && _selectedActionTypes[_selectedActionTypes.Count() - 1] == ActionType.OPERATOR))
             {
 
                 //get the current operator
