@@ -65,7 +65,7 @@ namespace EquationFinder
             screenManager.AddScreen(new MainMenuScreen(), null);
 
             //set whether we are in a trail mode or not
-            EquationFinderGame.IsTrailMode = Guide.IsTrialMode;
+            EquationFinderGame.IsTrailMode = false;// Guide.IsTrialMode;
 
             base.Initialize();
         }

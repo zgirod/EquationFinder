@@ -153,7 +153,7 @@ namespace EquationFinder.Screens
 
             float pulsate = (float)Math.Sin(time * 6) + 1;
 
-            float scale = 1 + pulsate * 0.05f * selectionFade;
+            float scale = 1 + pulsate * 0.10f * selectionFade;
 
             // Modify the alpha to fade text out during transitions.
             color *= screen.TransitionAlpha;

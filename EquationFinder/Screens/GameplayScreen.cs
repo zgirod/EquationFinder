@@ -53,7 +53,7 @@ namespace EquationFinder.Screens
         List<HighScore> _highScores;
         Int64 _highScoreToBeat = 0;
         int _secondsPerRound = 60;
-        int _secondForCorrectAnswer = 5;
+        int _secondForCorrectAnswer = 10;
         bool _isPaused;
 
         // The font used to display UI elements
@@ -248,6 +248,19 @@ namespace EquationFinder.Screens
             else if (_clock.isFinished == false && _isPaused == false)
             {
 
+                int row = 0, col = 0;
+                while (row < this._boardSize)
+                {
+                    col = 0;
+                    while (col < this._boardSize)
+                    {
+                        _gameBoard[row, col].Update(this, (_currentY == row && _currentX == col), gameTime);
+                        col++;
+                    }
+                    row++;
+                }
+
+
                 if (_flashText.Active == false || _flashText.RunClock)
                 {
 
@@ -441,8 +454,64 @@ namespace EquationFinder.Screens
         private void AddOperation(GameTime gameTime, Move move)
         {
 
+            //if we don't have any equation select the number
+            //if (string.IsNullOrWhiteSpace(_currentEquation))
+            //{
+            //    this.SelectNumber(gameTime);
+            //}
+
+            //if we are on an operator and the button pressed is A, cycle through the controls
+            else if (move.Name == "A" && (_selectedActionTypes.Count > 0 && _selectedActionTypes[_selectedActionTypes.Count() - 1] == ActionType.OPERATOR))
+            {
+
+                //get the current operator
+                var currentOperator = _currentEquation[_currentEquation.Length - 1].ToString();
+
+                //get the new operator
+                var newOperator = "-";
+                if (currentOperator == "-")
+                {
+                    newOperator = "*";
+                }
+                else if (currentOperator == "*")
+                {
+                    newOperator = "/";
+                }
+                else if (currentOperator == "/")
+                {
+                    newOperator = "+";
+                }
+
+                //set the new equation
+                _currentEquation = _currentEquation.Substring(0, _currentEquation.Length - 1) + newOperator;
+
+                //play success sound
+                this.PlaySound(_correctSound, gameTime);
+
+            }
+            else if (_selectedActionTypes.Count > 0 && _selectedActionTypes[_selectedActionTypes.Count() - 1] == ActionType.OPERATOR)
+            {
+
+                string newOperator = "-";
+                if (move.Name == "X")
+                {
+                    newOperator = "*";
+                }
+                else if (move.Name == "Y")
+                {
+                    newOperator = "/";
+                }
+
+                //set the new equation
+                _currentEquation = _currentEquation.Substring(0, _currentEquation.Length - 1) + newOperator;
+
+                //play success sound
+                this.PlaySound(_correctSound, gameTime);
+
+            }
+
             //if we have a valid move
-            if (IsValidOperationMove(gameTime))
+            else if (IsValidOperationMove(gameTime))
             {
 
                 //add the current equation to the list
@@ -466,7 +535,7 @@ namespace EquationFinder.Screens
 
         }
 
-        private void SelectNumber(GameTime gameTime, Move move)
+        private void SelectNumber(GameTime gameTime)
         {
 
             //if we have a valid move
@@ -865,7 +934,7 @@ namespace EquationFinder.Screens
             }
             else if (move.Name == "Select")
             {
-                this.SelectNumber(gameTime, move);
+                this.SelectNumber(gameTime);
             }
             else if (move.Name == "Evaluate")
             {
