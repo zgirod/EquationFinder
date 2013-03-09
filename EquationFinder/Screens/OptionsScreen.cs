@@ -76,10 +76,10 @@ namespace EquationFinder.Screens
             var x = (ScreenManager.GraphicsDevice.Viewport.Width / 2) - 200;
             var y = (ScreenManager.GraphicsDevice.Viewport.Height / 2) - 50;
 
-
             //draw the strings
             spriteBatch.DrawString(_gameFont, string.Format("Board Size:   {0}", GameplayOptions.BoardSize), new Vector2(x, y), row == 1 ? Color.Blue : Color.Black);
             spriteBatch.DrawString(_gameFont, string.Format("Play Sound Effects:   {0}", GameplayOptions.PlaySoundEffects ? "Yes" : "No"), new Vector2(x, y + 50), row == 2 ? Color.Blue : Color.Black);
+            spriteBatch.DrawString(_gameFont, string.Format("Play Music:   {0}", GameplayOptions.PlayMusic), new Vector2(x, y + 100), row == 3 ? Color.Blue : Color.Black);
 
             // stop drawing
             spriteBatch.End();
@@ -135,15 +135,27 @@ namespace EquationFinder.Screens
         private void HandleDirection(Buttons direction)
         {
 
-            if (direction.Equals(Buttons.DPadUp) || direction.Equals(Buttons.LeftThumbstickUp)
-                || direction.Equals(Buttons.DPadDown) || direction.Equals(Buttons.LeftThumbstickDown))
+            if (direction.Equals(Buttons.DPadUp) || direction.Equals(Buttons.LeftThumbstickUp))
+            {
+
+                if (row == 1)
+                    row = 3;
+                else if (row == 2)
+                    row = 1;
+                else
+                    row = 2;
+
+
+            }
+            else if (direction.Equals(Buttons.DPadDown) || direction.Equals(Buttons.LeftThumbstickDown))
             {
 
                 if (row == 1)
                     row = 2;
+                else if (row == 2)
+                    row = 3;
                 else
                     row = 1;
-
 
             }
             else if (direction.Equals(Buttons.DPadLeft) || direction.Equals(Buttons.LeftThumbstickLeft))
@@ -163,13 +175,34 @@ namespace EquationFinder.Screens
 
 
                 }
-                else
+                else if (row == 2)
                 {
 
                     if (GameplayOptions.PlaySoundEffects)
                         GameplayOptions.PlaySoundEffects = false;
-                    else 
+                    else
                         GameplayOptions.PlaySoundEffects = true;
+
+                }
+                else
+                {
+
+                    if (GameplayOptions.PlayMusic == "Off")
+                    {
+                        GameplayOptions.PlayMusic = "Battle";
+                    }
+                    else if (GameplayOptions.PlayMusic == "Battle")
+                    {
+                        GameplayOptions.PlayMusic = "Dungeon";
+                    }
+                    else if (GameplayOptions.PlayMusic == "Dungeon")
+                    {
+                        GameplayOptions.PlayMusic = "Forest";
+                    }
+                    else if (GameplayOptions.PlayMusic == "Forest")
+                    {
+                        GameplayOptions.PlayMusic = "Off";
+                    }
 
                 }
 
@@ -190,13 +223,34 @@ namespace EquationFinder.Screens
                         GameplayOptions.BoardSize = 5;
 
                 }
-                else
+                else if (row == 2)
                 {
 
                     if (GameplayOptions.PlaySoundEffects)
                         GameplayOptions.PlaySoundEffects = false;
                     else
                         GameplayOptions.PlaySoundEffects = true;
+
+                }
+                else
+                {
+
+                    if (GameplayOptions.PlayMusic == "Off")
+                    {
+                        GameplayOptions.PlayMusic = "Forest";
+                    }
+                    else if (GameplayOptions.PlayMusic == "Battle")
+                    {
+                        GameplayOptions.PlayMusic = "Off";
+                    }
+                    else if (GameplayOptions.PlayMusic == "Dungeon")
+                    {
+                        GameplayOptions.PlayMusic = "Battle";
+                    }
+                    else if (GameplayOptions.PlayMusic == "Forest")
+                    {
+                        GameplayOptions.PlayMusic = "Dungeon";
+                    }
 
                 }
 

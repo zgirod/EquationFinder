@@ -8,20 +8,20 @@ namespace EquationFinder.DomainLogic
     public static class Parser
     {
 
-        private static List<string> _firstOperators = new List<string>() { "*", "/" };
-        private static List<string> _secondOperators = new List<string>() { "+", "-" };
+        private static char[] _firstOperators = new char[] { '*', '/' };
+        private static char[] _secondOperators = new char[] { '+', '-' };
         private static List<string> _parenthesis = new List<string>() { "(", ")" };
 
         public static decimal ParseEquation(string equation) 
         {
 
             //set the equation
-            equation = equation.Replace(" ", "").Trim();
+            equation = equation.Replace(" ", "").Trim(); ;
 
             //parse out the equation
             equation = Parser.ProcessParenthesis(equation);
-            equation = Parser.ProcessOperators(Parser._firstOperators, equation);
-            equation = Parser.ProcessOperators(Parser._secondOperators, equation);
+            equation = Parser.ProcessMultiDivideOperators(Parser._firstOperators, equation);
+            equation = Parser.ProcessAdditionDivideOperators(Parser._secondOperators, equation);
 
             //return the result
             return Convert.ToDecimal(equation);
@@ -66,34 +66,89 @@ namespace EquationFinder.DomainLogic
 
         }
 
-        private static string ProcessOperators(List<string> operators, string equation)
+        private static string ProcessMultiDivideOperators(char[] operators, string equation)
         {
 
-            //for each operator
-            foreach(var op in operators) 
+            //find the operator
+            var index = equation.IndexOfAny(operators);
+
+            //while we found our operator
+            while (index >= 0)
             {
 
-                //find the operator
-                var index = equation.IndexOf(op);
+                //get the operator
+                var op = equation[index].ToString();
 
-                //while we found our operator
-                while (index > 0)
+                //get my two number
+                var leftNumber = Parser.GetNumber(index, true, equation, false);
+                var rightNumber = Parser.GetNumber(index, false, equation, false);
+
+                //get the result of the operations
+                var result = Parser.ProcessOperator(leftNumber, rightNumber, op);
+
+                //get the sub equation to insert
+                var subEquationToInsert = string.Format("{0}{1}{2}", leftNumber.ToString(), op, rightNumber.ToString());
+
+                //update the equation
+                equation = equation.Replace(subEquationToInsert, result.ToString());
+
+                //try and see if we have that operator again
+                index = equation.IndexOfAny(operators);
+
+            }
+
+            //return the parsed equation
+            return equation;
+
+        }
+
+        private static string ProcessAdditionDivideOperators(char[] operators, string equation)
+        {
+
+            //find the operator
+            var index = equation.IndexOfAny(operators);
+
+            //while we found our operator
+            while (index >= 0)
+            {
+
+                //if our first chara is a '-'
+                var startNegative = false;
+                if (index == 0 && equation[0].ToString() == "-")
                 {
 
-                    //get my two number
-                    var leftNumber = Parser.GetNumber(index, true, equation);
-                    var rightNumber = Parser.GetNumber(index, false, equation);
+                    //keep going to the right, until we find a second operator
+                    index++;
+                    startNegative = true;
+                    while (index < equation.Length && (equation[index].ToString() != "+" && equation[index].ToString() != "-"))
+                        index++;
 
-                    //get the result of the operations
-                    var result = Parser.ProcessOperator(leftNumber, rightNumber, op);
-
-                    //update the equation
-                    equation = equation.Replace(string.Format("{0}{1}{2}", leftNumber.ToString(), op, rightNumber.ToString()), result.ToString());
-
-                    //try and see if we have that operator again
-                    index = equation.IndexOf(op);
+                    //if we traversed the whole equation, return
+                    if (index == equation.Length)
+                        return equation;
 
                 }
+
+                //get the operator
+                var op = equation[index].ToString();
+
+                //get my two number
+                var leftNumber = Parser.GetNumber(index, true, equation, true);
+                var rightNumber = Parser.GetNumber(index, false, equation, true);
+
+                //get the result of the operations
+                var result = Parser.ProcessOperator(leftNumber, rightNumber, op);
+
+                //get the sub equation to insert
+                var subEquationToInsert = string.Format("{0}{1}{2}", leftNumber.ToString(), op, rightNumber.ToString());
+                if (subEquationToInsert.StartsWith("-") && startNegative == false)
+                    subEquationToInsert = subEquationToInsert.Substring(1);
+
+                //update the equation
+                equation = equation.Replace(subEquationToInsert, result.ToString());
+
+                //try and see if we have that operator again
+                index = equation.IndexOfAny(operators);
 
             }
 
@@ -118,7 +173,7 @@ namespace EquationFinder.DomainLogic
 
         }
 
-        private static decimal GetNumber(int index, bool left, string equation)
+        private static decimal GetNumber(int index, bool left, string equation, bool careAboutNegative)
         {
             
             //go back or forth one digit
@@ -130,11 +185,20 @@ namespace EquationFinder.DomainLogic
             //setup our number
             var number = 0;
 
-            if (int.TryParse(equation[index].ToString(), out number))
+            if (int.TryParse(equation[index].ToString(), out number)
+                || (left == false && equation[index].ToString() == "-" && careAboutNegative))
             {
 
                 int i = index;
                 string value = "";
+
+                //we are allowed to start with a negative
+                if (left == false && equation[index].ToString() == "-" && careAboutNegative)
+                {
+                    value = "-";
+                    i++;
+                }
+
                 while (int.TryParse(equation[i].ToString(), out number))
                 {
                     
@@ -153,6 +217,12 @@ namespace EquationFinder.DomainLogic
                     if (i >= equation.Length || i < 0)
                         return Convert.ToDecimal(value);
                     
+                }
+
+                //we need to make sure we process negative numbers
+                if (left == true && equation[i].ToString() == "-" && careAboutNegative)
+                {
+                    value = "-" + value;
                 }
 
                 //return the number

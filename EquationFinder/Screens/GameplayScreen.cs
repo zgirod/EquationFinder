@@ -13,6 +13,7 @@ using EquationFinder.DomainLogic;
 using Microsoft.Xna.Framework.Storage;
 using EquationFinder.Objects;
 using Microsoft.Xna.Framework.GamerServices;
+using Microsoft.Xna.Framework.Media;
 
 namespace EquationFinder.Screens
 {
@@ -55,6 +56,7 @@ namespace EquationFinder.Screens
         int _secondsPerRound = 60;
         int _secondForCorrectAnswer = 10;
         bool _isPaused;
+        int _pasuedMenuCount;
 
         // The font used to display UI elements
         SpriteFont _gameFont;
@@ -64,6 +66,7 @@ namespace EquationFinder.Screens
         double _lastPlayedSound = 0;
         SoundEffect _correctSound;
         SoundEffect _incorrectSound;
+        Song _backgroundMusic;
 
         public GamePadState GamePadState { get; private set; }
         public KeyboardState KeyboardState { get; private set; }
@@ -99,6 +102,7 @@ namespace EquationFinder.Screens
             this._highScores = new List<HighScore>();
             this._highScoreToBeat = 0;
             this._isPaused = false;
+            this._pasuedMenuCount = 1;
 
         }
 
@@ -119,6 +123,18 @@ namespace EquationFinder.Screens
             // Load the laser and explosion sound effect
             _correctSound = _content.Load<SoundEffect>("sound/correct");
             _incorrectSound = _content.Load<SoundEffect>("sound/incorrect");
+
+            //if we want to play music, play it
+            if (GameplayOptions.PlayMusic != "Off")
+            {
+                
+                //get the song that we want to play
+                _backgroundMusic = _content.Load<Song>(string.Format("sound/{0}Theme", GameplayOptions.PlayMusic));
+
+                //play the song
+                this.PlayMusic(_backgroundMusic);
+
+            }
 
             // once the load has finished, we use ResetElapsedTime to tell the game's
             // timing mechanism that we have just finished a very long frame, and that
@@ -162,77 +178,17 @@ namespace EquationFinder.Screens
                         ScreenManager.GraphicsDevice.Viewport.Width,
                         ScreenManager.GraphicsDevice.Viewport.Height), Color.White);
 
-                // Draw the score
-                spriteBatch.DrawString(_gameFont, "Target: " + _target, new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 10, ScreenManager.GraphicsDevice.Viewport.Y), Color.Black);
-                spriteBatch.DrawString(_gameFont, "Equation: " + _currentEquation, new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 10, ScreenManager.GraphicsDevice.Viewport.Y + 30), Color.Black);
-                spriteBatch.DrawString(_gameFont, "Score: " + string.Format("{0:n0}", this._score), new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 10, ScreenManager.GraphicsDevice.Viewport.Y + 60), Color.Black);
-
-                //get the time string
-                var time = "Time:   " + _clock.displayClock;
-                if (_clock.displayClock == "Game Over")
-                    time = "Game Over";
-
-                //draw the space need for the time string
-                Vector2 timeSize = _gameFont.MeasureString(time);
-                spriteBatch.DrawString(_gameFont, time, new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Width - timeSize.X - 10,
-                    ScreenManager.GraphicsDevice.Viewport.Y), Color.Black);
-
-                int row = 0, col = 0;
-                while (row < this._boardSize)
+                //if we are not paused
+                if (!_isPaused)
                 {
-                    while (col < this._boardSize)
-                    {
 
-                        //get whether the current item is selected or not
-                        bool isSelected = IsActive && (row == this._currentY) && (col == this._currentX);
-
-                        //get whether the current item is selected or not
-                        bool isPreviouslySelected = _selectedYXs
-                            .FirstOrDefault(x => x == string.Format("{0},{1}", row, col)) != null;
-
-                        //show the item
-                        this._gameBoard[row, col].Draw(this, isSelected, isPreviouslySelected, gameTime);
-
-                        //go to the next column
-                        col++;
-
-                    }
-
-                    //go to the next row
-                    row++;
-                    col = 0;
+                    this.DrawGame(spriteBatch, gameTime);
 
                 }
-
-                //if we have flash text, draw the string
-                if (_flashText.Active)
+                else //if we are paused
                 {
 
-                    //calculate where the flash text goes
-                    Vector2 textSize = _gameFont.MeasureString(_flashText.Text);
-
-                    //draw the flash text
-                    if (_flashText.IsErrorText)
-                    {
-
-                        spriteBatch.DrawString(
-                            _gameFont,
-                            _flashText.Text,
-                            new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, ScreenManager.GraphicsDevice.Viewport.Height - 50f) - (textSize / 2),
-                            Color.Red);
-
-                    }
-                    else
-                    {
-
-                        spriteBatch.DrawString(
-                            _gameFont,
-                            _flashText.Text,
-                            new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, 50f) - (textSize / 2),
-                            Color.DarkBlue);
-
-                    }
-                    
+                    this.DrawPausedMenu(spriteBatch, gameTime);
 
                 }
 
@@ -240,6 +196,101 @@ namespace EquationFinder.Screens
                 spriteBatch.End();
 
             }
+
+        }
+
+        private void DrawPausedMenu(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+
+            //calculate my x and y
+            var x = (ScreenManager.GraphicsDevice.Viewport.Width / 2);
+            var y = (ScreenManager.GraphicsDevice.Viewport.Height / 2) - 50;
+
+            //draw the strings
+            spriteBatch.DrawString(_gameFont, "Resume Game", new Vector2(x - Convert.ToInt32(_gameFont.MeasureString("Resume Game").Length()), y), _pasuedMenuCount == 1 ? Color.Blue : Color.Black);
+            spriteBatch.DrawString(_gameFont, "Exit to menu", new Vector2(x - Convert.ToInt32(_gameFont.MeasureString("Exit to menu").Length()), y + 50), _pasuedMenuCount == 2 ? Color.Blue : Color.Black);
+
+
+        }
+
+        private void DrawGame(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+
+
+            // Draw the score
+            spriteBatch.DrawString(_gameFont, "Target: " + _target, new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 10, ScreenManager.GraphicsDevice.Viewport.Y), Color.Black);
+            spriteBatch.DrawString(_gameFont, "Equation: " + _currentEquation, new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 10, ScreenManager.GraphicsDevice.Viewport.Y + 30), Color.Black);
+            spriteBatch.DrawString(_gameFont, "Score: " + string.Format("{0:n0}", this._score), new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 10, ScreenManager.GraphicsDevice.Viewport.Y + 60), Color.Black);
+
+            //get the time string
+            var time = "Time:   " + _clock.displayClock;
+            if (_clock.displayClock == "Game Over")
+                time = "Game Over";
+
+            //draw the space need for the time string
+            Vector2 timeSize = _gameFont.MeasureString(time);
+            spriteBatch.DrawString(_gameFont, time, new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Width - timeSize.X - 10,
+                ScreenManager.GraphicsDevice.Viewport.Y), Color.Black);
+
+            int row = 0, col = 0;
+            while (row < this._boardSize)
+            {
+                while (col < this._boardSize)
+                {
+
+                    //get whether the current item is selected or not
+                    bool isSelected = IsActive && (row == this._currentY) && (col == this._currentX);
+
+                    //get whether the current item is selected or not
+                    bool isPreviouslySelected = _selectedYXs
+                        .FirstOrDefault(x => x == string.Format("{0},{1}", row, col)) != null;
+
+                    //show the item
+                    this._gameBoard[row, col].Draw(this, isSelected, isPreviouslySelected, gameTime);
+
+                    //go to the next column
+                    col++;
+
+                }
+
+                //go to the next row
+                row++;
+                col = 0;
+
+            }
+
+            //if we have flash text, draw the string
+            if (_flashText.Active)
+            {
+
+                //calculate where the flash text goes
+                Vector2 textSize = _gameFont.MeasureString(_flashText.Text);
+
+                //draw the flash text
+                if (_flashText.IsErrorText)
+                {
+
+                    spriteBatch.DrawString(
+                        _gameFont,
+                        _flashText.Text,
+                        new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, ScreenManager.GraphicsDevice.Viewport.Height - 50f) - (textSize / 2),
+                        Color.Red);
+
+                }
+                else
+                {
+
+                    spriteBatch.DrawString(
+                        _gameFont,
+                        _flashText.Text,
+                        new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, 50f) - (textSize / 2),
+                        Color.DarkBlue);
+
+                }
+
+
+            }
+
 
         }
 
@@ -379,6 +430,23 @@ namespace EquationFinder.Screens
 
         #region Private Board Methods
 
+
+        private void PlayMusic(Song song)
+        {
+            // Due to the way the MediaPlayer plays music,
+            // we have to catch the exception. Music will play when the game is not tethered
+            try
+            {
+                // Play the music
+                MediaPlayer.Play(song);
+
+                // Loop the currently playing song
+                MediaPlayer.IsRepeating = true;
+
+            }
+            catch { }
+        }
+
         private void HandleDirection(Buttons direction)
         {
 
@@ -430,8 +498,11 @@ namespace EquationFinder.Screens
 
         private void HandlePausedDirection(Buttons direction)
         {
-            
-            //TODO: handle paused direction changes
+
+            if (_pasuedMenuCount == 1)
+                _pasuedMenuCount = 2;
+            else
+                _pasuedMenuCount = 1;
 
         }
 
@@ -481,7 +552,7 @@ namespace EquationFinder.Screens
             {
 
                 //if we dont have a current equation OR if we are not on the previously selected
-                if (string.IsNullOrWhiteSpace(_currentEquation)
+                if (string.IsNullOrEmpty(_currentEquation.Trim())
                     || _currentX != _selectedX 
                     || _currentY != _selectedY)
                 {
@@ -517,7 +588,7 @@ namespace EquationFinder.Screens
             {
 
                 //if we dont have a current equation OR if we are not on the previously selected
-                if (string.IsNullOrWhiteSpace(_currentEquation))
+                if (string.IsNullOrEmpty(_currentEquation.Trim()))
                 {
 
                     //play error sound
@@ -902,6 +973,7 @@ namespace EquationFinder.Screens
                 if (!_isPaused)
                 {
                     _isPaused = true;
+                    MediaPlayer.Pause();
                 }
 
             }
@@ -1123,13 +1195,22 @@ namespace EquationFinder.Screens
         {
             
             //TODO: Handle paused game logic here
-            if (move.Name == "Start")
+            if (move.Name == "Start"
+                || move.Name == "B"
+                || (move.Name == "A" && _pasuedMenuCount == 1))
             {
 
                 if (_isPaused)
                 {
                     _isPaused = false;
+                    MediaPlayer.Play(_backgroundMusic);
                 }
+
+            }
+            else if (move.Name == "A" && _pasuedMenuCount == 2)
+            {
+
+                LoadingScreen.Load(ScreenManager, true, null, new MainMenuScreen());
 
             }
 

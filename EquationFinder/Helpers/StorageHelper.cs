@@ -131,6 +131,7 @@ namespace EquationFinder.Helpers
 
                     sw.WriteLine(GameplayOptions.BoardSize.ToString());
                     sw.WriteLine(GameplayOptions.PlaySoundEffects.ToString());
+                    sw.WriteLine(GameplayOptions.PlayMusic.ToString());
 
                 }
 
@@ -172,8 +173,10 @@ namespace EquationFinder.Helpers
 
                         if (row == 1)
                             GameplayOptions.BoardSize = Convert.ToInt32(sr.ReadLine());
-                        else
+                        else if (row == 2)
                             GameplayOptions.PlaySoundEffects = Convert.ToBoolean(sr.ReadLine());
+                        else
+                            GameplayOptions.PlayMusic = sr.ReadLine();
 
                         row++;
 

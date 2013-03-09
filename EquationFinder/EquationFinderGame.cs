@@ -62,10 +62,11 @@ namespace EquationFinder
             // Activate the first screens.
             GameplayOptions.BoardSize = 5;
             GameplayOptions.PlaySoundEffects = true;
+            GameplayOptions.PlayMusic = "Battle";
             screenManager.AddScreen(new MainMenuScreen(), null);
 
             //set whether we are in a trail mode or not
-            EquationFinderGame.IsTrailMode = false;// Guide.IsTrialMode;
+            EquationFinderGame.IsTrailMode = Guide.IsTrialMode;
 
             base.Initialize();
         }
