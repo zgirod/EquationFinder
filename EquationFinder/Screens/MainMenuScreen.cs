@@ -95,6 +95,20 @@ namespace EquationFinder.Screens
                 LoadingScreen.Load(ScreenManager, true, null, new HighScoresScreen());
 
             }
+            else if (key == "Make")
+            {
+
+                //load the make your own game screen
+                LoadingScreen.Load(ScreenManager, true, null, new MYOScreen());
+
+            }
+            else if (key == "Controls")
+            {
+
+                //load the controls screen
+                LoadingScreen.Load(ScreenManager, true, null, new ControlsScreen());
+
+            }
 
         }
 

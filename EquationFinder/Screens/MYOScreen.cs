@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace EquationFinder.Screens
 {
-    public class FAQScreen : GameScreen
+    public class MYOScreen : GameScreen
     {
 
         // The font used to display UI elements
@@ -27,7 +27,7 @@ namespace EquationFinder.Screens
 
         private List<ScreenText> _screenText;
 
-        public FAQScreen()
+        public MYOScreen()
         {
 
         }
@@ -169,7 +169,7 @@ namespace EquationFinder.Screens
 
             }
             else if ((direction.Equals(Buttons.DPadDown) || direction.Equals(Buttons.LeftThumbstickDown))
-                && (_y >= -1200))
+                && (_y >= -150))
             {
 
                 for (int i = 0; i < _screenText.Count; i++)
@@ -195,23 +195,8 @@ namespace EquationFinder.Screens
             var y = ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y;
 
             //add some text
-            y = AddTextToList("Q: Why does it start on 19?", y, false, false);
-            y = AddTextToList("Because that is my birthday.", y, true, true);
-            y = AddTextToList("Q: How do I go to the next number?", y, false, true);
-            y = AddTextToList("If you get 4 or more equations correct you can move to the next number.", y, true, true);
-            y = AddTextToList("Q: What do I get in the trail mode?", y, false, true);
-            y = AddTextToList("You get to play the full game however to don't get to go to the next number when your round ends.", y, true, true);
-            y = AddTextToList("Q: How are scores calculated?", y, false, true);
-            y = AddTextToList("We count the number of numbers and operators, excluding parenthesis, and multiple that count by the target number.", y, true, true);
-            y = AddTextToList("Q: Can you show me an example?", y, false, true);
-            y = AddTextToList("Say your target is 19 and your equations was (9 * 3) - 10 + 2.", y, false, true);
-            y = AddTextToList("There are 4 numbers and 3 operators which equals 7.  7 * 19 = 133.", y, true, true);
-            y = AddTextToList("Q: What operators are allowed?", y, false, true);
-            y = AddTextToList("Parentheses, Multiplication and Division, Addition and Subtraction.", y, true, true);
-            y = AddTextToList("Q: When does A select a number or cycle operators?", y, false, true);
-            y = AddTextToList("When your are on the previously selected number, A will cycle the operators else it will try to select the number.", y, true, true);
-            y = AddTextToList("Q: Why are the controls so odd?", y, false, true);
-            y = AddTextToList("It is the best I could come up with. Email equationfinder@gmail.com with suggestions.", y, true, true);
+            y = AddTextToList("This game is open source, you can check out the code here:", y, false, false);
+            y = AddTextToList("https://github.com/zgirod/EquationFinder", y, true, true);
 
         }
 

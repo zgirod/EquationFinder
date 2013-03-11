@@ -114,7 +114,8 @@ namespace EquationFinder.Screens
         {
 
             //if we want to go back
-            if (move.Name == "B")
+            if (move.Name == "B"
+                || move.Name == "A")
             {
 
                 //save the game options
