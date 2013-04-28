@@ -1,5 +1,6 @@
 Content\img\blank.xnb
 Content\img\paper_fibers.xnb
+Content\img\controls.xnb
 Content\gameFont.xnb
 Content\menufont.xnb
 Content\boardFont.xnb
@@ -8,7 +9,6 @@ Content\sound\incorrect.xnb
 Content\sound\BattleTheme.xnb
 Content\sound\DungeonTheme.xnb
 Content\sound\ForestTheme.xnb
-Content\img\controls.xnb
 Content\sound\BattleTheme.wma
 Content\sound\DungeonTheme.wma
 Content\sound\ForestTheme.wma

@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using EquationFinder.Input;
 using Microsoft.Xna.Framework.Input;
+using EquationFinder.Helpers;
 
 namespace EquationFinder.Screens
 {
@@ -35,8 +36,8 @@ namespace EquationFinder.Screens
 
             GamePadState lastGamePadState = GamePadState;
             KeyboardState lastKeyboardState = KeyboardState;
-            GamePadState = GamePad.GetState(PlayerIndex.One);
-            KeyboardState = Keyboard.GetState(PlayerIndex.One);
+            GamePadState = InputHelpers.GetGamePadStateForAllPLayers();
+            KeyboardState = InputHelpers.GetKeyboardStateForAllPLayers();
 
             //call the base update
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);

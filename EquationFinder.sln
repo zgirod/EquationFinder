@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EquationFinderContent", "Eq
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EquationFinder", "EquationFinder\EquationFinder.csproj", "{1CEF3523-7BD6-4F02-A12A-92F324AC270E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyStorage [Windows]", "EasyStorage\EasyStorage [Windows].csproj", "{A89EB1D5-B286-48EB-A864-315ABCDAA024}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,18 @@ Global
 		{1CEF3523-7BD6-4F02-A12A-92F324AC270E}.Release|x86.Build.0 = Release|x86
 		{1CEF3523-7BD6-4F02-A12A-92F324AC270E}.Release|Xbox 360.ActiveCfg = Release|x86
 		{1CEF3523-7BD6-4F02-A12A-92F324AC270E}.Release|Xbox 360.Build.0 = Release|x86
+		{A89EB1D5-B286-48EB-A864-315ABCDAA024}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{A89EB1D5-B286-48EB-A864-315ABCDAA024}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{A89EB1D5-B286-48EB-A864-315ABCDAA024}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{A89EB1D5-B286-48EB-A864-315ABCDAA024}.Debug|x86.ActiveCfg = Debug|x86
+		{A89EB1D5-B286-48EB-A864-315ABCDAA024}.Debug|x86.Build.0 = Debug|x86
+		{A89EB1D5-B286-48EB-A864-315ABCDAA024}.Debug|Xbox 360.ActiveCfg = Debug|x86
+		{A89EB1D5-B286-48EB-A864-315ABCDAA024}.Release|Any CPU.ActiveCfg = Release|x86
+		{A89EB1D5-B286-48EB-A864-315ABCDAA024}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{A89EB1D5-B286-48EB-A864-315ABCDAA024}.Release|Mixed Platforms.Build.0 = Release|x86
+		{A89EB1D5-B286-48EB-A864-315ABCDAA024}.Release|x86.ActiveCfg = Release|x86
+		{A89EB1D5-B286-48EB-A864-315ABCDAA024}.Release|x86.Build.0 = Release|x86
+		{A89EB1D5-B286-48EB-A864-315ABCDAA024}.Release|Xbox 360.ActiveCfg = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

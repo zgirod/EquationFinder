@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using EquationFinder.Helpers;
 
 
 namespace EquationFinder.Input
@@ -78,7 +79,8 @@ namespace EquationFinder.Input
             // Get latest input state.
             GamePadState lastGamePadState = GamePadState;
             KeyboardState lastKeyboardState = KeyboardState;
-            GamePadState = GamePad.GetState(PlayerIndex);
+            GamePadState = InputHelpers.GetGamePadStateForAllPLayers();
+
 #if WINDOWS
             if (PlayerIndex == PlayerIndex.One)
             {

@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input.Touch;
 using EquationFinder.Input;
+using Microsoft.Xna.Framework.Input;
 
 namespace EquationFinder
 {
@@ -338,7 +339,6 @@ namespace EquationFinder
                 isExiting = true;
             }
         }
-
 
         #endregion
     }

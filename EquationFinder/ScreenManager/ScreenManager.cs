@@ -28,7 +28,7 @@ namespace EquationFinder
 
         //InputState input = new InputState();
 
-        InputManager _inputManager;
+        InputManager[] _inputManagers;
 
         // This is the master list of moves in logical order. This array is kept
         // around in order to draw the move list on the screen in this order.
@@ -138,10 +138,14 @@ namespace EquationFinder
             // Construct a move list which will store its own copy of the moves array.
             _moveList = new MoveList(_moves);
 
-            //setup the input manager
-            _inputManager = new InputManager(PlayerIndex.One, _moveList.LongestMoveLength);
-
+            //setup the input manager to watch for moves form any controller
+            _inputManagers = new InputManager[4];
+            for (int i = 0; i < _inputManagers.Length; ++i)
+                _inputManagers[i] = new InputManager((PlayerIndex)i, _moveList.LongestMoveLength);
+            
+            //we are now initialized
             isInitialized = true;
+
         }
 
 
@@ -189,11 +193,24 @@ namespace EquationFinder
         public override void Update(GameTime gameTime)
         {
 
-            // Get the updated input manager.
-            _inputManager.Update(gameTime);
-
             // Detection and record the current player's most recent move.
-            Move newMove = _moveList.DetectMove(_inputManager);
+            Move newMove = null;
+
+            //for each input manager
+            for (int i = 0; i < _inputManagers.Length; ++i)
+            {
+
+                // Get the updated input manager.
+                _inputManagers[i].Update(gameTime);
+
+                //try and see if there is a new move
+                newMove =_moveList.DetectMove(_inputManagers[i]);
+
+                //if we have a new move, stop looking
+                if (newMove != null)
+                    break;
+
+            }
 
             // Make a copy of the master screen list, to avoid confusion if
             // the process of updating one screen adds or removes others.

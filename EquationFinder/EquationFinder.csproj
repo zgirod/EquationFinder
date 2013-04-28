@@ -81,6 +81,7 @@
     <Compile Include="EquationFinderGame.cs" />
     <Compile Include="Helpers\BigInt.cs" />
     <Compile Include="Helpers\ClockTimer.cs" />
+    <Compile Include="Helpers\InputHelpers.cs" />
     <Compile Include="Helpers\StorageHelper.cs" />
     <Compile Include="Input\Direction.cs" />
     <Compile Include="Input\InputManager.cs" />
@@ -141,6 +142,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EasyStorage\EasyStorage [Windows].csproj">
+      <Project>{A89EB1D5-B286-48EB-A864-315ABCDAA024}</Project>
+      <Name>EasyStorage [Windows]</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EquationFinderContent\EquationFinderContent.contentproj">
       <Project>{63757A35-1283-4496-AA74-DECED64CA6CF}</Project>
       <Name>EquationFinderContent %28Content%29</Name>

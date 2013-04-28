@@ -11,6 +11,8 @@ using Microsoft.Xna.Framework.Media;
 using EquationFinder.Screens;
 using Microsoft.Xna.Framework.Storage;
 using EquationFinder.Helpers;
+using EasyStorage;
+using System.IO;
 
 namespace EquationFinder
 {
@@ -25,11 +27,8 @@ namespace EquationFinder
         SpriteBatch spriteBatch;
         ScreenManager screenManager;
 
-        private IAsyncResult _asyncResult;
-        private bool _requestedStorageDevice, _asyncFinsihed;
-        
-        private static StorageDevice _storageDevice;
-        public static StorageDevice StorageDevice { get { return _storageDevice; } }
+        private bool _asyncFinsihed;
+        public static IAsyncSaveDevice _saveDevice;
         public static bool IsTrailMode;
 
         public EquationFinderGame()
@@ -52,11 +51,33 @@ namespace EquationFinder
             // Create the screen manager component.
             screenManager = new ScreenManager(this);
 
+            //set the supported languages
+            EasyStorageSettings.SetSupportedLanguages(Language.English);
+
+            // create and add our SaveDevice
+            SharedSaveDevice sharedSaveDevice = new SharedSaveDevice();
+            Components.Add(sharedSaveDevice);
+
+            // make sure we hold on to the device
+            _saveDevice = sharedSaveDevice;
+
+            // hook two event handlers to force the user to choose a new device if they cancel the
+            // device selector or if they disconnect the storage device after selecting it
+            sharedSaveDevice.DeviceSelectorCanceled += (s, e) => e.Response = SaveDeviceEventResponse.Force;
+            sharedSaveDevice.DeviceDisconnected += (s, e) => e.Response = SaveDeviceEventResponse.Force;
+
+            // prompt for a device on the first Update we can
+            sharedSaveDevice.PromptForDevice();
+
+#if XBOX
+			// add the GamerServicesComponent
+			Components.Add(new Microsoft.Xna.Framework.GamerServices.GamerServicesComponent(this));
+#endif
+
             //add the screen manager as a component
             Components.Add(screenManager);
 
             //reset the storage device settings
-            this._requestedStorageDevice = false;
             this._asyncFinsihed = false;
 
             // Activate the first screens.
@@ -99,36 +120,72 @@ namespace EquationFinder
         protected override void Update(GameTime gameTime)
         {
 
-            //if we are finished
-            if (!_requestedStorageDevice)
+            //if the device is ready and we haven't loaded
+            if (_saveDevice.IsReady && _asyncFinsihed == false)
             {
 
-                _requestedStorageDevice = true;
-                _asyncResult = StorageDevice.BeginShowSelector(null, null);
+                _saveDevice.LoadAsync(
+                    "EquationFinder",
+                    StorageHelper._gameSettingsFileName,
+                    file =>
+                    {
+
+                        int row = 1;
+
+                        //loop through each file
+                        using (StreamReader sr = new StreamReader(file))
+                        {
+                            while (!sr.EndOfStream)
+                            {
+
+                                if (row == 1)
+                                    GameplayOptions.BoardSize = Convert.ToInt32(sr.ReadLine());
+                                else if (row == 2)
+                                    GameplayOptions.PlaySoundEffects = Convert.ToBoolean(sr.ReadLine());
+                                else
+                                    GameplayOptions.PlayMusic = sr.ReadLine();
+
+                                row++;
+
+                            }
+                        }
+
+                        _asyncFinsihed = true;
+
+                    });
 
             }
 
-            if (_requestedStorageDevice == true
-                && _asyncFinsihed == false
-                && _asyncResult.IsCompleted)
-            {
+            ////if we are finished
+            //if (!_requestedStorageDevice)
+            //{
 
-                _asyncFinsihed = true;
+            //    _requestedStorageDevice = true;
+            //    _asyncResult = StorageDevice.BeginShowSelector(null, null);
 
-                //save our storage device
-                StorageDevice device = StorageDevice.EndShowSelector(_asyncResult);
-                if (device != null && device.IsConnected)
-                {
+            //}
 
-                    //set the device
-                    _storageDevice = device;
+            //if (_requestedStorageDevice == true
+            //    && _asyncFinsihed == false
+            //    && _asyncResult.IsCompleted)
+            //{
 
-                    //load the game settings
-                    StorageHelper.LoadGameSettings();
+            //    _asyncFinsihed = true;
 
-                }
+            //    //save our storage device
+            //    StorageDevice device = StorageDevice.EndShowSelector(_asyncResult);
+            //    if (device != null && device.IsConnected)
+            //    {
 
-            }
+            //        //set the device
+            //        _storageDevice = device;
+
+            //        //load the game settings
+            //        StorageHelper.LoadGameSettings();
+
+            //    }
+
+            //}
 
 
             base.Update(gameTime);
@@ -145,6 +202,28 @@ namespace EquationFinder
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
+        }
+
+        public static void SaveFile(string fileName, string fileContents) 
+        {
+
+
+            // make sure the device is ready
+            if (_saveDevice.IsReady)
+            {
+                // save a file asynchronously. this will trigger IsBusy to return true
+                // for the duration of the save process.
+                _saveDevice.SaveAsync(
+                    "EquationFinder",
+                    fileName,
+                    stream =>
+                    {
+                        //write the contents of the file to the file system
+                        using (StreamWriter writer = new StreamWriter(stream))
+                            writer.Write(fileContents);
+                    });
+            }
+
         }
 
     }

@@ -39,8 +39,8 @@ namespace EquationFinder.Screens
 
             GamePadState lastGamePadState = GamePadState;
             KeyboardState lastKeyboardState = KeyboardState;
-            GamePadState = GamePad.GetState(PlayerIndex.One);
-            KeyboardState = Keyboard.GetState(PlayerIndex.One);
+            GamePadState = InputHelpers.GetGamePadStateForAllPLayers();
+            KeyboardState = InputHelpers.GetKeyboardStateForAllPLayers();
 
             //get the direction
             //get the direction
