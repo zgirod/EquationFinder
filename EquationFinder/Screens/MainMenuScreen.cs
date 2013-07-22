@@ -63,7 +63,7 @@ namespace EquationFinder.Screens
             {
 
                 //load the game play screen
-                LoadingScreen.Load(ScreenManager, true, null, new GameplayScreen(19));
+                LoadingScreen.Load(ScreenManager, true, null, new GameplayScreen(GameplayOptions.StartNumber));
 
             }
             else if (key == "FAQ")

@@ -79,14 +79,15 @@
     <Compile Include="DomainLogic\BoardLogic.cs" />
     <Compile Include="DomainLogic\Parser.cs" />
     <Compile Include="EquationFinderGame.cs" />
-    <Compile Include="Helpers\BigInt.cs" />
     <Compile Include="Helpers\ClockTimer.cs" />
+    <Compile Include="Helpers\ColorPaletteHelper.cs" />
     <Compile Include="Helpers\InputHelpers.cs" />
     <Compile Include="Helpers\StorageHelper.cs" />
     <Compile Include="Input\Direction.cs" />
     <Compile Include="Input\InputManager.cs" />
     <Compile Include="Input\Move.cs" />
     <Compile Include="Input\MoveList.cs" />
+    <Compile Include="Objects\ColorPalette.cs" />
     <Compile Include="Objects\HighScore.cs" />
     <Compile Include="Objects\ScreenText.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

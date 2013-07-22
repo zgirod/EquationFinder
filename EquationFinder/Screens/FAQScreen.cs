@@ -116,7 +116,7 @@ namespace EquationFinder.Screens
                 _content = new ContentManager(ScreenManager.Game.Services, "Content");
 
             // Load the background texture we will be using
-            _texture = _content.Load<Texture2D>("img/paper_fibers");
+            _texture = _content.Load<Texture2D>("img/bg/Fibers");
 
             // Load the score font
             _gameFont = _content.Load<SpriteFont>("gameFont");

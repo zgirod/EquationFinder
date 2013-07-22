@@ -14,14 +14,15 @@ namespace EquationFinder.DomainLogic
 
             //create the board
             var board = new int[boardSize, boardSize];
+            var boardCrumbs = boardValues.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries).ToList();
 
             var totalSize = boardSize * boardSize;
-            int count = 1, row = 0, col = 0, i = 0;
+            int count = 0, row = 0, col = 0, i = 0;
             do
             {
 
                 //get the number for this cell
-                var cellNumber = Convert.ToInt32(boardValues[i].ToString());
+                var cellNumber = Convert.ToInt32(boardCrumbs[count].ToString());
                 if (cellNumber == 0)
                     cellNumber = 10;
 
@@ -43,31 +44,38 @@ namespace EquationFinder.DomainLogic
                 i++;
 
             }
-            while (count <= totalSize);
+            while (count < totalSize);
 
 
             return board;
 
         }
 
-        public static int[,] CreateBoard(int boardSize)
+        public static int[,] CreateBoard(int boardSize, int target)
         {
 
             //get a random borad for our size
-            var hashKey = BoardLogic.RandomHash(boardSize * boardSize);
+            var hashKey = BoardLogic.RandomHash(boardSize * boardSize, target);
 
             //return the board
             return BoardLogic.CreateBoard(boardSize, hashKey);
 
         }
 
-        private static string RandomHash(int number)
+        private static string RandomHash(int number, int target)
         {
+
+            //this gets a max number based upon the target
+            int maxNumber = Convert.ToInt32(target / 2) + 1;
+            if (maxNumber < 10)
+                maxNumber = 10;
+            else if (maxNumber > 99)
+                maxNumber = 99;
 
             var boardValues = "";
             var random = new Random();
             for(int i = 0; i <= number; i++)
-                boardValues += random.Next(0, 10);
+                boardValues += random.Next(0, maxNumber) + "|";
             return boardValues;
             
         }

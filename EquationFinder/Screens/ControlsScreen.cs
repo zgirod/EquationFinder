@@ -19,7 +19,8 @@ namespace EquationFinder.Screens
         ContentManager _content;
         SpriteFont _gameFont;
         Texture2D _texture;
-        Texture2D _controls;
+        Texture2D[] _controls;
+        int screenCount = 0;
 
         public GamePadState GamePadState { get; private set; }
         public KeyboardState KeyboardState { get; private set; }
@@ -38,6 +39,11 @@ namespace EquationFinder.Screens
             KeyboardState lastKeyboardState = KeyboardState;
             GamePadState = InputHelpers.GetGamePadStateForAllPLayers();
             KeyboardState = InputHelpers.GetKeyboardStateForAllPLayers();
+
+            //get the direction
+            var direction = Direction.FromInput(GamePadState, KeyboardState);
+            if (Direction.FromInput(lastGamePadState, lastKeyboardState) != direction && direction != 0.0)
+                this.HandleDirection(direction);
 
             //call the base update
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
@@ -64,12 +70,12 @@ namespace EquationFinder.Screens
                     ScreenManager.GraphicsDevice.Viewport.Height), Color.White);
 
             //draw the controllers images
-            spriteBatch.Draw(_controls,
+            spriteBatch.Draw(_controls[screenCount],
                 new Rectangle(
-                    (ScreenManager.GraphicsDevice.Viewport.Width / 2) - (_controls.Width / 2),
-                    (ScreenManager.GraphicsDevice.Viewport.Height / 2) - (_controls.Height / 2),
-                    _controls.Width,
-                    _controls.Height), Color.White);
+                    (ScreenManager.GraphicsDevice.Viewport.Width / 2) - (_controls[screenCount].Width / 2),
+                    (ScreenManager.GraphicsDevice.Viewport.Height / 2) - (_controls[screenCount].Height / 2),
+                    _controls[screenCount].Width,
+                    _controls[screenCount].Height), Color.White);
 
             // stop drawing
             spriteBatch.End();
@@ -84,8 +90,12 @@ namespace EquationFinder.Screens
                 _content = new ContentManager(ScreenManager.Game.Services, "Content");
 
             // Load the background texture we will be using
-            _texture = _content.Load<Texture2D>("img/paper_fibers");
-            _controls = _content.Load<Texture2D>("img/controls");
+            _texture = _content.Load<Texture2D>("img/bg/Fibers");
+            
+            //load all the images 
+            _controls = new Texture2D[21];
+            for (int i = 0; i < 21; i++)
+                _controls[i] = _content.Load<Texture2D>("img/howto/" + (i+1).ToString());
 
             // Load the score font
             _gameFont = _content.Load<SpriteFont>("gameFont");
@@ -105,16 +115,35 @@ namespace EquationFinder.Screens
         {
 
             //if we want to go back
-            if (move.Name == "B"
-                || move.Name == "A")
-            {
+            if (move.Name == "A")
+                screenCount++;
+            else if (move.Name == "B")
+                screenCount--;
 
-                //go back to the menu
+            //do not allow the screen count to go below 0
+            if (screenCount < 0) screenCount = 0;
+
+            //if we have gone through all the screen, go back to the main menu
+            if (this.screenCount >= _controls.Count())
                 LoadingScreen.Load(ScreenManager, true, null, new MainMenuScreen());
 
-            }
-
             base.HandleMove(gameTime, move);
+        }
+
+        private void HandleDirection(Buttons direction)
+        {
+            if (direction.Equals(Buttons.DPadRight) || direction.Equals(Buttons.LeftThumbstickRight))
+                screenCount++;
+            else if (direction.Equals(Buttons.DPadLeft) || direction.Equals(Buttons.LeftThumbstickLeft))
+                screenCount--;
+
+            //do not allow the screen count to go below 0
+            if (screenCount < 0) screenCount = 0;
+
+            //if we have gone through all the screen, go back to the main menu
+            if (this.screenCount >= _controls.Count())
+                LoadingScreen.Load(ScreenManager, true, null, new MainMenuScreen());
+
         }
 
         #endregion

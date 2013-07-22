@@ -43,7 +43,6 @@ namespace EquationFinder.Screens
             KeyboardState = InputHelpers.GetKeyboardStateForAllPLayers();
 
             //get the direction
-            //get the direction
             var direction = Direction.FromInput(GamePadState, KeyboardState);
             if (Direction.FromInput(lastGamePadState, lastKeyboardState) != direction && direction != 0.0)
                 this.HandleDirection(direction);
@@ -74,12 +73,14 @@ namespace EquationFinder.Screens
 
             //calculate my x and y
             var x = (ScreenManager.GraphicsDevice.Viewport.Width / 2) - 200;
-            var y = (ScreenManager.GraphicsDevice.Viewport.Height / 2) - 50;
+            var y = (ScreenManager.GraphicsDevice.Viewport.Height / 2) - 125;
 
             //draw the strings
             spriteBatch.DrawString(_gameFont, string.Format("Board Size:   {0}", GameplayOptions.BoardSize), new Vector2(x, y), row == 1 ? Color.Blue : Color.Black);
             spriteBatch.DrawString(_gameFont, string.Format("Play Sound Effects:   {0}", GameplayOptions.PlaySoundEffects ? "Yes" : "No"), new Vector2(x, y + 50), row == 2 ? Color.Blue : Color.Black);
             spriteBatch.DrawString(_gameFont, string.Format("Play Music:   {0}", GameplayOptions.PlayMusic), new Vector2(x, y + 100), row == 3 ? Color.Blue : Color.Black);
+            spriteBatch.DrawString(_gameFont, string.Format("Start Number:   {0}", GameplayOptions.StartNumber), new Vector2(x, y + 150), row == 4 ? Color.Blue : Color.Black);
+            spriteBatch.DrawString(_gameFont, string.Format("Background:   {0}", GameplayOptions.BackgroundImage), new Vector2(x, y + 200), row == 5 ? Color.Blue : Color.Black);
 
             // stop drawing
             spriteBatch.End();
@@ -94,7 +95,7 @@ namespace EquationFinder.Screens
                 _content = new ContentManager(ScreenManager.Game.Services, "Content");
 
             // Load the background texture we will be using
-            _texture = _content.Load<Texture2D>("img/paper_fibers");
+            _texture = _content.Load<Texture2D>("img/bg/Fibers");
 
             // Load the score font
             _gameFont = _content.Load<SpriteFont>("gameFont");
@@ -140,11 +141,15 @@ namespace EquationFinder.Screens
             {
 
                 if (row == 1)
-                    row = 3;
+                    row = 5;
                 else if (row == 2)
                     row = 1;
-                else
+                else if (row == 3)
                     row = 2;
+                else if (row == 4)
+                    row = 3;
+                else
+                    row = 4;
 
 
             }
@@ -155,6 +160,10 @@ namespace EquationFinder.Screens
                     row = 2;
                 else if (row == 2)
                     row = 3;
+                else if (row == 3)
+                    row = 4;
+                else if (row == 4)
+                    row = 5;
                 else
                     row = 1;
 
@@ -185,7 +194,7 @@ namespace EquationFinder.Screens
                         GameplayOptions.PlaySoundEffects = true;
 
                 }
-                else
+                else if (row == 3)
                 {
 
                     if (GameplayOptions.PlayMusic == "Off")
@@ -203,6 +212,38 @@ namespace EquationFinder.Screens
                     else if (GameplayOptions.PlayMusic == "Forest")
                     {
                         GameplayOptions.PlayMusic = "Off";
+                    }
+                    else
+                    {
+                        GameplayOptions.PlayMusic = "Off";
+                    }
+
+                }
+                else if (row == 4)
+                {
+
+                    //go to the next number below
+                    GameplayOptions.StartNumber--;
+
+                    //if the number is below 1, go back to the max number
+                    if (GameplayOptions.StartNumber < 11)
+                        GameplayOptions.StartNumber = 50;
+
+                }
+                else if (row == 5)
+                {
+
+                    if (GameplayOptions.BackgroundImage == "Fibers")
+                    {
+                        GameplayOptions.BackgroundImage = "Tree";
+                    }
+                    else if (GameplayOptions.BackgroundImage == "Map")
+                    {
+                        GameplayOptions.BackgroundImage = "Fibers";
+                    }
+                    else if (GameplayOptions.BackgroundImage == "Tree")
+                    {
+                        GameplayOptions.BackgroundImage = "Map";
                     }
 
                 }
@@ -233,7 +274,7 @@ namespace EquationFinder.Screens
                         GameplayOptions.PlaySoundEffects = true;
 
                 }
-                else
+                else if (row == 3)
                 {
 
                     if (GameplayOptions.PlayMusic == "Off")
@@ -252,8 +293,40 @@ namespace EquationFinder.Screens
                     {
                         GameplayOptions.PlayMusic = "Dungeon";
                     }
+                    else
+                    {
+                        GameplayOptions.PlayMusic = "Off";
+                    }
 
                 }
+                else if (row == 4)
+                {
+
+                    GameplayOptions.StartNumber++;
+
+                    //if the number is above 50, go to 1
+                    if (GameplayOptions.StartNumber > 50)
+                        GameplayOptions.StartNumber = 11;
+
+                }
+                else if (row == 5)
+                {
+
+                    if (GameplayOptions.BackgroundImage == "Fibers")
+                    {
+                        GameplayOptions.BackgroundImage = "Map";
+                    }
+                    else if (GameplayOptions.BackgroundImage == "Map")
+                    {
+                        GameplayOptions.BackgroundImage = "Tree";
+                    }
+                    else if (GameplayOptions.BackgroundImage == "Tree")
+                    {
+                        GameplayOptions.BackgroundImage = "Fibers";
+                    }
+
+                }
+
 
             }
 

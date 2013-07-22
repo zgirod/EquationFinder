@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using EquationFinder.Objects;
 
 namespace EquationFinder.Screens
 {
@@ -137,12 +138,13 @@ namespace EquationFinder.Screens
         public virtual void Draw(GameplayScreen screen, 
             bool isSelected, 
             bool isPreviouslySelected,
-            GameTime gameTime)
+            GameTime gameTime,
+            ColorPalette colorPalette)
         {
 
 
             // Draw the selected entry in yellow, otherwise white.
-            Color color = isSelected ? Color.Red : Color.Black;
+            Color color = isSelected ? colorPalette.BoardTextSelected : colorPalette.BoardText;
 
             //if the item isn't selected, check to see if it is previously selectedd
             if (!isSelected && isPreviouslySelected)
@@ -164,8 +166,7 @@ namespace EquationFinder.Screens
 
             Vector2 origin = new Vector2(0, screenManager.Font.LineSpacing / 2);
 
-            spriteBatch.DrawString(screenManager.Font, text, position, color, 0,
-                                   origin, scale, SpriteEffects.None, 0);
+            spriteBatch.DrawString(screenManager.Font, text, position, color, 0, origin, scale, SpriteEffects.None, 0);
         }
 
 

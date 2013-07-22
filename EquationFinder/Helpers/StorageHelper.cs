@@ -68,7 +68,9 @@ namespace EquationFinder.Helpers
             string fileContents =
                 GameplayOptions.BoardSize.ToString()
                 + Environment.NewLine + GameplayOptions.PlaySoundEffects.ToString()
-                + Environment.NewLine + GameplayOptions.PlayMusic.ToString();
+                + Environment.NewLine + GameplayOptions.PlayMusic.ToString()
+                + Environment.NewLine + GameplayOptions.StartNumber.ToString()
+                + Environment.NewLine + GameplayOptions.BackgroundImage.ToString();
 
             EquationFinderGame.SaveFile(_gameSettingsFileName, fileContents);
 

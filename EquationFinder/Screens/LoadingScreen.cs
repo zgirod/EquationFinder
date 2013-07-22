@@ -62,7 +62,7 @@ namespace EquationFinder.Screens
                                                             loadingIsSlow,
                                                             screensToLoad);
 
-            screenManager.AddScreen(loadingScreen, controllingPlayer);
+            screenManager.AddScreen(loadingScreen);
         }
 
 
@@ -89,7 +89,7 @@ namespace EquationFinder.Screens
                 {
                     if (screen != null)
                     {
-                        ScreenManager.AddScreen(screen, ControllingPlayer);
+                        ScreenManager.AddScreen(screen);
                     }
                 }
 

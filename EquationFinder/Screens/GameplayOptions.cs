@@ -10,5 +10,7 @@ namespace EquationFinder.Screens
         public static int BoardSize;
         public static bool PlaySoundEffects;
         public static string PlayMusic;
+        public static int StartNumber;
+        public static string BackgroundImage;
     }
 }

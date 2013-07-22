@@ -84,7 +84,9 @@ namespace EquationFinder
             GameplayOptions.BoardSize = 5;
             GameplayOptions.PlaySoundEffects = true;
             GameplayOptions.PlayMusic = "Battle";
-            screenManager.AddScreen(new MainMenuScreen(), null);
+            GameplayOptions.StartNumber = 19;
+            GameplayOptions.BackgroundImage = "Fibers";
+            screenManager.AddScreen(new MainMenuScreen());
 
             //set whether we are in a trail mode or not
             EquationFinderGame.IsTrailMode = Guide.IsTrialMode;
@@ -138,13 +140,19 @@ namespace EquationFinder
                             while (!sr.EndOfStream)
                             {
 
+                                //set the proper gameplay property
                                 if (row == 1)
                                     GameplayOptions.BoardSize = Convert.ToInt32(sr.ReadLine());
                                 else if (row == 2)
                                     GameplayOptions.PlaySoundEffects = Convert.ToBoolean(sr.ReadLine());
-                                else
+                                else if (row == 3)
                                     GameplayOptions.PlayMusic = sr.ReadLine();
+                                else if (row == 4)
+                                    GameplayOptions.StartNumber = Convert.ToInt32(sr.ReadLine());
+                                else if (row == 5)
+                                    GameplayOptions.BackgroundImage = sr.ReadLine();
 
+                                //go to the next row
                                 row++;
 
                             }
