@@ -193,7 +193,7 @@ namespace EquationFinder.Screens
             _y = 0;
 
             //set the y axis
-            var y = ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y;
+            var y = ScreenManager.GraphicsDevice.Viewport.Y;
 
             //add some text
             y = AddTextToList("This game is open source, you can check out the code here:", y, false, false);
@@ -206,7 +206,7 @@ namespace EquationFinder.Screens
 
 
             float stringWidth;
-            var availableWidth = (ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Width * 0.95);
+            var availableWidth = (ScreenManager.GraphicsDevice.Viewport.Width * 0.95);
             string newText = "";
 
             //get the width of the string
@@ -271,7 +271,7 @@ namespace EquationFinder.Screens
                     _screenText.Add(new ScreenText()
                     {
                         Text = newText.Trim(),
-                        Vector = new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, y)
+                        Vector = new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 10, y)
                     });
 
                     //get the rest of the text
@@ -292,7 +292,7 @@ namespace EquationFinder.Screens
                 _screenText.Add(new ScreenText()
                 {
                     Text = text.Trim(),
-                    Vector = new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + 10, y)
+                    Vector = new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 10, y)
                 });
 
 

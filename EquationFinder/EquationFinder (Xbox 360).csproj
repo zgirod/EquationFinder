@@ -59,6 +59,10 @@
     <XnaCompressContent>true</XnaCompressContent>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EasyStorage\EasyStorage [Xbox].csproj">
+      <Project>{46C81A1E-8509-4B35-AE33-121730BDD910}</Project>
+      <Name>EasyStorage [Xbox]</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EquationFinderContent\EquationFinderContent.contentproj">
       <Project>{63757A35-1283-4496-AA74-DECED64CA6CF}</Project>
       <Name>EquationFinderContent %28Content%29</Name>
@@ -69,13 +73,15 @@
     <Compile Include="DomainLogic\BoardLogic.cs" />
     <Compile Include="DomainLogic\Parser.cs" />
     <Compile Include="EquationFinderGame.cs" />
-    <Compile Include="Helpers\BigInt.cs" />
     <Compile Include="Helpers\ClockTimer.cs" />
+    <Compile Include="Helpers\ColorPaletteHelper.cs" />
+    <Compile Include="Helpers\InputHelpers.cs" />
     <Compile Include="Helpers\StorageHelper.cs" />
     <Compile Include="Input\Direction.cs" />
     <Compile Include="Input\InputManager.cs" />
     <Compile Include="Input\Move.cs" />
     <Compile Include="Input\MoveList.cs" />
+    <Compile Include="Objects\ColorPalette.cs" />
     <Compile Include="Objects\HighScore.cs" />
     <Compile Include="Objects\ScreenText.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -99,11 +99,15 @@ namespace EquationFinder.Helpers
             var highScores = new List<HighScore>();
             var fileName = StorageHelper.HighScroreFileName(boardSize);
 
+            //if the file doesn't exist, return a blank list
+            if (!EquationFinderGame._saveDevice.FileExists("EquationFinder", fileName))
+                return highScores;
+
             //if the device is ready and we haven't loaded
             if (EquationFinderGame._saveDevice.IsReady)
             {
 
-                EquationFinderGame._saveDevice.LoadAsync(
+                EquationFinderGame._saveDevice.Load(
                     "EquationFinder",
                     fileName,
                     file =>

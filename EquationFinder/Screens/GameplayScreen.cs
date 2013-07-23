@@ -36,6 +36,7 @@ namespace EquationFinder.Screens
         int _currentX, _currentY;
         int _selectedX, _selectedY;
         int _target;
+        int _startingNumber;
         int _score;
         int _totalCorrect;
         int _roundCorrect;
@@ -70,6 +71,8 @@ namespace EquationFinder.Screens
         Song _backgroundMusic;
         Texture2D _backgroundImage;
 
+        private int _moveCount = 0;
+
         public GamePadState GamePadState { get; private set; }
         public KeyboardState KeyboardState { get; private set; }
 
@@ -89,6 +92,7 @@ namespace EquationFinder.Screens
             _selectedX = -1;
             _selectedY = -1;
             _target = target;
+            _startingNumber = target;
 
             //get a board
             this._gameBoard = new BoardItem[GameplayOptions.BoardSize, GameplayOptions.BoardSize];
@@ -232,12 +236,18 @@ namespace EquationFinder.Screens
 
             //draw the space need for the time string
             Vector2 stringSize = _gameFont.MeasureString(time);
-            spriteBatch.DrawString(_gameFont, time, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width - stringSize.Length() - 10,
+            spriteBatch.DrawString(_gameFont, time, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width - stringSize.Length() - 30,
                 ScreenManager.GraphicsDevice.Viewport.Y + 10), this._colorPalatte.DisplayText);
 
-            var remaining =  "Remaining: " + string.Format("{0:n0}", Math.Max(this._roundTarget - this._roundCorrect, 0));
+            //if they are in trail mode, show N/A
+            var remaining = "Remaining: ";
+            if (EquationFinderGame.IsTrailMode)
+                remaining += "N/A";
+            else
+                remaining += string.Format("{0:n0}", Math.Max(this._roundTarget - this._roundCorrect, 0));
+
             stringSize = _gameFont.MeasureString(remaining);
-            spriteBatch.DrawString(_gameFont, remaining, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width - stringSize.Length() - 10, ScreenManager.GraphicsDevice.Viewport.Y + 40), this._colorPalatte.DisplayText);
+            spriteBatch.DrawString(_gameFont, remaining, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width - stringSize.Length() - 30, ScreenManager.GraphicsDevice.Viewport.Y + 40), this._colorPalatte.DisplayText);
 
             int row = 0, col = 0;
             while (row < this._boardSize)
@@ -286,7 +296,7 @@ namespace EquationFinder.Screens
                 spriteBatch.DrawString(
                     _gameFont,
                     _flashText.Text,
-                    new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, 50f) - (textSize / 2),
+                    new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, ScreenManager.GraphicsDevice.Viewport.Y + 50f) - (textSize / 2),
                     (_flashText.IsErrorText) ? this._colorPalatte.FlashTextIncorrect : this._colorPalatte.FlashTextCorrect);
 
             }
@@ -382,7 +392,7 @@ namespace EquationFinder.Screens
 
                     // the game is over, show the high score screen
                     MediaPlayer.Stop();
-                    LoadingScreen.Load(ScreenManager, true, null, new SaveHighScoreScreen(_boardSize, _score, _score > _highScoreToBeat));
+                    LoadingScreen.Load(ScreenManager, true, null, new SaveHighScoreScreen(_boardSize, _score, _score > _highScoreToBeat, _startingNumber));
 
                 }
 
@@ -421,6 +431,8 @@ namespace EquationFinder.Screens
         public override void HandleMove(GameTime gameTime, Move move)
         {
 
+            _moveCount++;
+
             //don't do anything if the clock isn't running
             if (_clock.isRunning == false || _clock.isFinished == true)
                 return;
@@ -438,7 +450,6 @@ namespace EquationFinder.Screens
         #endregion
 
         #region Private Board Methods
-
 
         private void PlayMusic(Song song)
         {
@@ -1239,20 +1250,20 @@ namespace EquationFinder.Screens
 
         #region High Score Methods
 
-        public void SaveHighScores(string initials)
-        {
+        //public void SaveHighScores(string initials)
+        //{
 
-            //add the new high score object
-            _highScores.Add(new HighScore() 
-            {
-                Initials = initials,
-                Score = _score
-            });
+        //    //add the new high score object
+        //    _highScores.Add(new HighScore() 
+        //    {
+        //        Initials = string.Format("{0} ({1})", initials, _startingNumber),
+        //        Score = _score
+        //    });
 
-            //save the file
-            StorageHelper.SaveHighScores(_highScores, _boardSize);
+        //    //save the file
+        //    StorageHelper.SaveHighScores(_highScores, _boardSize);
 
-        }
+        //}
 
         public List<HighScore> LoadHighScores()
         {

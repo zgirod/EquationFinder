@@ -37,7 +37,7 @@ namespace EquationFinder.Input
         
         /// <summary>
         /// This is the size of the "merge window" for combining button presses that
-        /// occur at almsot the same time.
+        /// occur at almost the same time.
         /// If it is too small, players will find it difficult to perform moves which
         /// require pressing several buttons simultaneously.
         /// If it is too large, players will find it difficult to perform moves which
@@ -176,7 +176,7 @@ namespace EquationFinder.Input
                 }
             }
 
-            // Rnless this move is a component of a larger sequence,
+            // Unless this move is a component of a larger sequence,
             if (!move.IsSubMove)
             {
                 // consume the used inputs.

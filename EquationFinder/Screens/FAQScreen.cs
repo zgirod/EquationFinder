@@ -196,12 +196,10 @@ namespace EquationFinder.Screens
             var y = ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y;
 
             //add some text
-            y = AddTextToList("Q: Why does it start on 19?", y, false, false);
-            y = AddTextToList("Because that is my birthday.", y, true, true);
             y = AddTextToList("Q: How do I go to the next number?", y, false, true);
-            y = AddTextToList("If you get 4 or more equations correct you can move to the next number.", y, true, true);
+            y = AddTextToList("This is the target number divided by 3.", y, true, true);
             y = AddTextToList("Q: What do I get in the trail mode?", y, false, true);
-            y = AddTextToList("You get to play the full game however to don't get to go to the next number when your round ends.", y, true, true);
+            y = AddTextToList("You get to play the full game however to don't get to go to the next number when your round ends.  In the full game you get to go to the next number if you get enough equations correct.", y, true, true);
             y = AddTextToList("Q: How are scores calculated?", y, false, true);
             y = AddTextToList("We count the number of numbers and operators, excluding parenthesis, and multiple that count by the target number.", y, true, true);
             y = AddTextToList("Q: Can you show me an example?", y, false, true);

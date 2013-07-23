@@ -32,8 +32,9 @@ namespace EquationFinder.Screens
         private int _letterNumber;
         private int _highScoreToEnter;
         private string _first, _second, _third;
+        private int _startingNumber;
 
-        public SaveHighScoreScreen(int boardSize, int score, bool hasHighScore)
+        public SaveHighScoreScreen(int boardSize, int score, bool hasHighScore, int startingNumber)
         {
 
             //set our options
@@ -42,6 +43,7 @@ namespace EquationFinder.Screens
             _hasHighScore = hasHighScore;
             _letterNumber = 1;
             _highScoreToEnter = -1;
+            _startingNumber = startingNumber;
 
             //load the high scores 
             _highScores = StorageHelper.LoadHighScores(_boardSize);
@@ -222,8 +224,13 @@ namespace EquationFinder.Screens
                     //set the initials for the high score
                     _highScores[_highScoreToEnter].Initials = string.Format("{0}{1}{2}", _first, _second, _third);
 
-                    //save the new high scores
+                    //save the most recent initials
                     StorageHelper.SaveInitials(_highScores[_highScoreToEnter].Initials);
+
+                    //update the initials to have the starting number in them
+                    _highScores[_highScoreToEnter].Initials += string.Format(" ({0})", _startingNumber);
+
+                    //save the high scores
                     StorageHelper.SaveHighScores(_highScores, _boardSize);
 
                 }

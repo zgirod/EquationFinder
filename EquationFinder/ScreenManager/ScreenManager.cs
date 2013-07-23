@@ -119,12 +119,10 @@ namespace EquationFinder
                         Buttons.X),
                     new Move("Y",    
                         Buttons.Y),
-                    new Move("Select",
+                    new Move("Undo",
                         Buttons.LeftTrigger),
                     new Move("Evaluate",
                         Buttons.RightTrigger),
-                    new Move("Undo",    
-                        Buttons.Back),
                     new Move("Left Parenthesis",    
                         Buttons.LeftShoulder),
                     new Move("Right Parenthesis",    
@@ -139,7 +137,7 @@ namespace EquationFinder
             _moveList = new MoveList(_moves);
 
             //setup the input manager to watch for moves form any controller
-            _inputManagers = new InputManager[4];
+            _inputManagers = new InputManager[1];
             for (int i = 0; i < _inputManagers.Length; ++i)
                 _inputManagers[i] = new InputManager((PlayerIndex)i, _moveList.LongestMoveLength);
             

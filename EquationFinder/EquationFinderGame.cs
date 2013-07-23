@@ -69,10 +69,10 @@ namespace EquationFinder
             // prompt for a device on the first Update we can
             sharedSaveDevice.PromptForDevice();
 
-#if XBOX
-			// add the GamerServicesComponent
-			Components.Add(new Microsoft.Xna.Framework.GamerServices.GamerServicesComponent(this));
-#endif
+//#if XBOX
+//            // add the GamerServicesComponent
+//            Components.Add(new Microsoft.Xna.Framework.GamerServices.GamerServicesComponent(this));
+//#endif
 
             //add the screen manager as a component
             Components.Add(screenManager);
@@ -163,38 +163,6 @@ namespace EquationFinder
                     });
 
             }
-
-            ////if we are finished
-            //if (!_requestedStorageDevice)
-            //{
-
-            //    _requestedStorageDevice = true;
-            //    _asyncResult = StorageDevice.BeginShowSelector(null, null);
-
-            //}
-
-            //if (_requestedStorageDevice == true
-            //    && _asyncFinsihed == false
-            //    && _asyncResult.IsCompleted)
-            //{
-
-            //    _asyncFinsihed = true;
-
-            //    //save our storage device
-            //    StorageDevice device = StorageDevice.EndShowSelector(_asyncResult);
-            //    if (device != null && device.IsConnected)
-            //    {
-
-            //        //set the device
-            //        _storageDevice = device;
-
-            //        //load the game settings
-            //        StorageHelper.LoadGameSettings();
-
-            //    }
-
-            //}
-
 
             base.Update(gameTime);
         }
