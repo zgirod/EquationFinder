@@ -240,7 +240,7 @@ namespace EquationFinder.Screens
                 ScreenManager.GraphicsDevice.Viewport.Y + 10), this._colorPalatte.DisplayText);
 
             //if they are in trail mode, show N/A
-            var remaining = "Remaining: ";
+            var remaining = "Next Level: ";
             if (EquationFinderGame.IsTrailMode)
                 remaining += "N/A";
             else

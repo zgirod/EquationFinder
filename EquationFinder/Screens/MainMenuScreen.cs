@@ -41,9 +41,9 @@ namespace EquationFinder.Screens
             MenuEntries.Add(menuEntry);
 
             //add the make your own game entry
-            menuEntry = new MenuEntry("Make your own game", "Make");
-            menuEntry.Selected += MenuEntry_Selected;
-            MenuEntries.Add(menuEntry);
+            //menuEntry = new MenuEntry("Make your own game", "Make");
+            //menuEntry.Selected += MenuEntry_Selected;
+            //MenuEntries.Add(menuEntry);
 
             //add the exit option
             menuEntry = new MenuEntry("Exit", "Exit");

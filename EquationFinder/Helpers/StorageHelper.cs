@@ -37,7 +37,7 @@ namespace EquationFinder.Helpers
             if (EquationFinderGame._saveDevice.IsReady)
             {
 
-                EquationFinderGame._saveDevice.LoadAsync(
+                EquationFinderGame._saveDevice.Load(
                     "EquationFinder",
                     fileName,
                     file =>
