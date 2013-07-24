@@ -213,8 +213,23 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="img\bg\Tree.png">
-      <Name>Tree</Name>
+    <Compile Include="img\bg\Color.png">
+      <Name>Color</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="img\bg\Round_Dreams.png">
+      <Name>Round_Dreams</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="img\bg\Smoke.png">
+      <Name>Smoke</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="img\bg\Wood.png">
+      <Name>Wood</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

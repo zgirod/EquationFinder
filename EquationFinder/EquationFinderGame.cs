@@ -85,7 +85,7 @@ namespace EquationFinder
             GameplayOptions.PlaySoundEffects = true;
             GameplayOptions.PlayMusic = "Battle";
             GameplayOptions.StartNumber = 19;
-            GameplayOptions.BackgroundImage = "Fibers";
+            GameplayOptions.BackgroundImage = "Map";
             screenManager.AddScreen(new MainMenuScreen());
 
             //set whether we are in a trail mode or not

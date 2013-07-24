@@ -80,7 +80,7 @@ namespace EquationFinder.Screens
             spriteBatch.DrawString(_gameFont, string.Format("Play Sound Effects:   {0}", GameplayOptions.PlaySoundEffects ? "Yes" : "No"), new Vector2(x, y + 50), row == 2 ? Color.Blue : Color.Black);
             spriteBatch.DrawString(_gameFont, string.Format("Play Music:   {0}", GameplayOptions.PlayMusic), new Vector2(x, y + 100), row == 3 ? Color.Blue : Color.Black);
             spriteBatch.DrawString(_gameFont, string.Format("Start Number:   {0}", GameplayOptions.StartNumber), new Vector2(x, y + 150), row == 4 ? Color.Blue : Color.Black);
-            spriteBatch.DrawString(_gameFont, string.Format("Background:   {0}", GameplayOptions.BackgroundImage), new Vector2(x, y + 200), row == 5 ? Color.Blue : Color.Black);
+            spriteBatch.DrawString(_gameFont, string.Format("Background:   {0}", GameplayOptions.BackgroundImage.Replace("_", " ")), new Vector2(x, y + 200), row == 5 ? Color.Blue : Color.Black);
 
             // stop drawing
             spriteBatch.End();
@@ -233,17 +233,29 @@ namespace EquationFinder.Screens
                 else if (row == 5)
                 {
 
-                    if (GameplayOptions.BackgroundImage == "Fibers")
+                    if (GameplayOptions.BackgroundImage == "Color")
                     {
-                        GameplayOptions.BackgroundImage = "Tree";
+                        GameplayOptions.BackgroundImage = "Wood";
+                    }
+                    else if (GameplayOptions.BackgroundImage == "Fibers")
+                    {
+                        GameplayOptions.BackgroundImage = "Color";
                     }
                     else if (GameplayOptions.BackgroundImage == "Map")
                     {
                         GameplayOptions.BackgroundImage = "Fibers";
                     }
-                    else if (GameplayOptions.BackgroundImage == "Tree")
+                    else if (GameplayOptions.BackgroundImage == "Round_Dreams")
                     {
                         GameplayOptions.BackgroundImage = "Map";
+                    }
+                    else if (GameplayOptions.BackgroundImage == "Smoke")
+                    {
+                        GameplayOptions.BackgroundImage = "Round_Dreams";
+                    }
+                    else if (GameplayOptions.BackgroundImage == "Wood")
+                    {
+                        GameplayOptions.BackgroundImage = "Smoke";
                     }
 
                 }
@@ -312,17 +324,29 @@ namespace EquationFinder.Screens
                 else if (row == 5)
                 {
 
-                    if (GameplayOptions.BackgroundImage == "Fibers")
+                    if (GameplayOptions.BackgroundImage == "Color")
+                    {
+                        GameplayOptions.BackgroundImage = "Fibers";
+                    }
+                    else if (GameplayOptions.BackgroundImage == "Fibers")
                     {
                         GameplayOptions.BackgroundImage = "Map";
                     }
                     else if (GameplayOptions.BackgroundImage == "Map")
                     {
-                        GameplayOptions.BackgroundImage = "Tree";
+                        GameplayOptions.BackgroundImage = "Round_Dreams";
                     }
-                    else if (GameplayOptions.BackgroundImage == "Tree")
+                    else if (GameplayOptions.BackgroundImage == "Round_Dreams")
                     {
-                        GameplayOptions.BackgroundImage = "Fibers";
+                        GameplayOptions.BackgroundImage = "Smoke";
+                    }
+                    else if (GameplayOptions.BackgroundImage == "Smoke")
+                    {
+                        GameplayOptions.BackgroundImage = "Wood";
+                    }
+                    else if (GameplayOptions.BackgroundImage == "Wood")
+                    {
+                        GameplayOptions.BackgroundImage = "Color";
                     }
 
                 }

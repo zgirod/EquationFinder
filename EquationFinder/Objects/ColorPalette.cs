@@ -14,6 +14,7 @@ namespace EquationFinder.Objects
         public Color FlashTextIncorrect { get; set; }
         public Color BoardText { get; set; }
         public Color BoardTextSelected { get; set; }
+        public Color BoardTextPreviouslySelected { get; set; }
         public Color PausedMenuTextSelected { get; set; }
         public Color PausedMenuTextUnselected { get; set; }
 

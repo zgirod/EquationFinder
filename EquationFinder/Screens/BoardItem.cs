@@ -148,7 +148,7 @@ namespace EquationFinder.Screens
 
             //if the item isn't selected, check to see if it is previously selectedd
             if (!isSelected && isPreviouslySelected)
-                color = Color.Blue;
+                color = colorPalette.BoardTextPreviouslySelected;
 
             // Pulsate the size of the selected menu entry.
             double time = gameTime.TotalGameTime.TotalSeconds;
