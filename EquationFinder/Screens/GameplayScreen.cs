@@ -26,6 +26,14 @@ namespace EquationFinder.Screens
         RIGHT_PARENTHESIS
     }
 
+    public enum SelectActionResult
+    {
+        NOT_CONNECTED,
+        OPERATOR_FIRST,
+        ALREADY_SELECTED,
+        SUCCESS
+    }
+
     public class GameplayScreen : GameScreen
     {
 
@@ -379,7 +387,7 @@ namespace EquationFinder.Screens
 
                 //reset the flash text
                 if( _flashText.Active == true
-                    && (gameTime.TotalGameTime.TotalMilliseconds - _flashText.StartTime) > 1000)
+                    && (gameTime.TotalGameTime.TotalMilliseconds - _flashText.StartTime) > 1250)
                 {
                     _flashText.Active = false;
                     _flashText.Text = "";
@@ -694,8 +702,10 @@ namespace EquationFinder.Screens
         private void SelectNumber(GameTime gameTime)
         {
 
+            var result = this.IsValidNumberMove(gameTime);
+
             //if we have a valid move
-            if (this.IsValidNumberMove(gameTime))
+            if (result == SelectActionResult.SUCCESS)
             {
 
                 //add the current equation to the list
@@ -723,10 +733,13 @@ namespace EquationFinder.Screens
             else
             {
 
-                //TODO: Beef up error message, already selected number, numbers must connect
-
                 //set the flash text
-                this._flashText.SetFlashText("You must select an operator first", gameTime.TotalGameTime.TotalMilliseconds, true, true);
+                if (result == SelectActionResult.OPERATOR_FIRST) 
+                    this._flashText.SetFlashText("You must select an operator first.", gameTime.TotalGameTime.TotalMilliseconds, true, true);
+                else if (result == SelectActionResult.ALREADY_SELECTED) 
+                    this._flashText.SetFlashText("Number already selected.", gameTime.TotalGameTime.TotalMilliseconds, true, true);
+                else if (result == SelectActionResult.NOT_CONNECTED)
+                    this._flashText.SetFlashText("Numbers must be connected.", gameTime.TotalGameTime.TotalMilliseconds, true, true);
 
             }
 
@@ -847,8 +860,7 @@ namespace EquationFinder.Screens
             {
 
                 var undoType = _undoType[_undoType.Count() - 1];
-                if (undoType == "Number" 
-                    || undoType == "Operation"
+                if (undoType == "Operation"
                     || undoType == "Left Parenthesis")
                 {
                     this.PlaySound(_correctSound, gameTime);
@@ -871,9 +883,22 @@ namespace EquationFinder.Screens
 
         }
 
-        private bool IsValidNumberMove(GameTime gameTime)
+        private SelectActionResult IsValidNumberMove(GameTime gameTime)
         {
 
+
+            if (_selectedX < 0 && _selectedY < 0)
+            {
+                this.PlaySound(_correctSound, gameTime);
+                return SelectActionResult.SUCCESS;
+            }
+
+            if (!((Math.Abs(_selectedX - _currentX) <= 1) && (Math.Abs(_selectedY - _currentY) <= 1)))
+            {
+                //play the bad sound
+                this.PlaySound(_incorrectSound, gameTime);
+                return SelectActionResult.NOT_CONNECTED;
+            }
 
             //Check to make sure this is a valid move for a number
             if (_undoType.Count() > 0)
@@ -883,60 +908,43 @@ namespace EquationFinder.Screens
                 if (undoType == "Number" || undoType == "Right Parenthesis")
                 {
                     this.PlaySound(_incorrectSound, gameTime);
-                    return false;
+                    return SelectActionResult.OPERATOR_FIRST;
                 }
 
             }
 
-            if (_selectedX < 0 && _selectedY < 0)
-            {
-                this.PlaySound(_correctSound, gameTime);
-                return true;
-            }
-
-                //if the current is within range of the selected
-            else if ((Math.Abs(_selectedX - _currentX) <= 1) && (Math.Abs(_selectedY - _currentY) <= 1))
-            {
-                //if the current is the selected, return false
-                if (_selectedY == _currentY && _selectedX == _currentX)
-                {
-                    //play the bad sound
-                    this.PlaySound(_incorrectSound, gameTime);
-                    return false;
-                }
-                else
-                {
-
-                    //for each previously selected YX
-                    foreach (var yx in _selectedYXs)
-                    {
-
-                        //get the x and y
-                        var crumbs = yx.Split(new char[] { ',' });
-
-                        //if we have already selected the YX
-                        if (_currentY == int.Parse(crumbs[0]) && _currentX == int.Parse(crumbs[1]))
-                        {
-                            //play the bad sound
-                            this.PlaySound(_incorrectSound, gameTime);
-                            return false;
-                        }
-
-                    }
-
-                    //play the good sound
-                    this.PlaySound(_correctSound, gameTime);
-                    return true;
-                }
-
-            }
-            else
+            
+            //if the current is the selected, return false
+            if (_selectedY == _currentY && _selectedX == _currentX)
             {
                 //play the bad sound
                 this.PlaySound(_incorrectSound, gameTime);
-                return false;
+                return SelectActionResult.ALREADY_SELECTED;
             }
+            else
+            {
 
+                //for each previously selected YX
+                foreach (var yx in _selectedYXs)
+                {
+
+                    //get the x and y
+                    var crumbs = yx.Split(new char[] { ',' });
+
+                    //if we have already selected the YX
+                    if (_currentY == int.Parse(crumbs[0]) && _currentX == int.Parse(crumbs[1]))
+                    {
+                        //play the bad sound
+                        this.PlaySound(_incorrectSound, gameTime);
+                        return SelectActionResult.ALREADY_SELECTED;
+                    }
+
+                }
+
+                //play the good sound
+                this.PlaySound(_correctSound, gameTime);
+                return SelectActionResult.SUCCESS;
+            }
 
         }
 
@@ -1069,6 +1077,12 @@ namespace EquationFinder.Screens
                     _currentEquation = _currentEquation.Trim();
 
                 }
+                else
+                {
+
+                    this._flashText.SetFlashText("Can't use left parenthesis now.", gameTime.TotalGameTime.TotalMilliseconds, true, true);
+
+                }
 
             }
             else if (move.Name == "Right Parenthesis")
@@ -1084,6 +1098,12 @@ namespace EquationFinder.Screens
 
                     //update the equation
                     _currentEquation += ")";
+
+                }
+                else
+                {
+
+                    this._flashText.SetFlashText("Can't use right parenthesis now.", gameTime.TotalGameTime.TotalMilliseconds, true, true);
 
                 }
 
@@ -1194,7 +1214,7 @@ namespace EquationFinder.Screens
                 {
 
                     //set the flash text
-                    _flashText.SetFlashText(string.Format("Incorrect, you number was {0}", actual), gameTime.TotalGameTime.TotalMilliseconds, true, true);
+                    _flashText.SetFlashText(string.Format("Incorrect, result was {0}", actual), gameTime.TotalGameTime.TotalMilliseconds, true, true);
 
                     //play the bad sound
                     this.PlaySound(_incorrectSound, gameTime);
@@ -1216,7 +1236,6 @@ namespace EquationFinder.Screens
         private void HandlePausedMove(GameTime gameTime, Move move)
         {
             
-            //TODO: Handle paused game logic here
             if (move.Name == "Start"
                 || move.Name == "B"
                 || (move.Name == "A" && _pasuedMenuCount == 1))

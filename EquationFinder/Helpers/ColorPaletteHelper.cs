@@ -94,8 +94,8 @@ namespace EquationFinder.Helpers
                     BoardTextSelected = Color.Black,
                     BoardTextPreviouslySelected = Color.Blue,
                     DisplayText = Color.WhiteSmoke,
-                    FlashTextCorrect = Color.Green,
-                    FlashTextIncorrect = Color.DarkRed,
+                    FlashTextCorrect = Color.LawnGreen,
+                    FlashTextIncorrect = Color.OrangeRed,
                     PausedMenuTextSelected = Color.DarkRed,
                     PausedMenuTextUnselected = Color.Black
                 };
