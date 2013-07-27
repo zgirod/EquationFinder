@@ -38,6 +38,11 @@ namespace EquationFinder.Helpers
             displayClock = endTimer.ToString(); 
         }
 
+        public void SetTime(int seconds)
+        {
+            endTimer = seconds;
+        }
+
         public void AddTime(int seconds)
         {
             endTimer += seconds;

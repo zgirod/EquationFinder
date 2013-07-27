@@ -422,6 +422,8 @@ namespace EquationFinder.Screens
                 
             }
 
+            _clock.SetTime(60);
+
             GamePadState lastGamePadState = GamePadState;
             KeyboardState lastKeyboardState = KeyboardState;
             GamePadState = InputHelpers.GetGamePadStateForAllPLayers();
@@ -568,15 +570,9 @@ namespace EquationFinder.Screens
         private void AddOperation(GameTime gameTime, Move move)
         {
 
-            //if we don't have any equation select the number
-            //if (string.IsNullOrWhiteSpace(_currentEquation))
-            //{
-                
-            //}
-
-
             //if we are on the letter A
-            if (move.Name == "A")
+            if (move.Name == "A"
+                || move.Name == "B")
             {
 
                 //if we dont have a current equation OR if we are not on the previously selected
@@ -607,40 +603,7 @@ namespace EquationFinder.Screens
                     && _currentY == _selectedY)
                 {
 
-                    this.SelectNewOperator(move, gameTime);
-
-                }
-
-            }
-
-            //if hit B
-            else if (move.Name == "B")
-            {
-
-                //if we dont have a current equation OR if we are not on the previously selected
-                if (string.IsNullOrEmpty(_currentEquation.Trim()))
-                {
-
-                    //play error sound
-                    this.PlaySound(_incorrectSound, gameTime);
-
-                    //set the flash text
-                    this._flashText.SetFlashText("You must select a number first", gameTime.TotalGameTime.TotalSeconds, true, true);
-
-                }
-
-                    //if the previous equation was an operator, cycle through the operator
-                else if (_selectedActionTypes.Count > 0 && _selectedActionTypes[_selectedActionTypes.Count() - 1] == ActionType.OPERATOR)
-                {
-
-                    //cycle through the operators
-                    this.CycleThroughOperators(gameTime);
-
-                }
-                else if (_selectedActionTypes.Count > 0 && _selectedActionTypes[_selectedActionTypes.Count() - 1] == ActionType.NUMBER)
-                {
-
-                    this.SelectNewOperator(move, gameTime);
+                    this.SelectNewOperator();
 
                 }
 
@@ -657,7 +620,7 @@ namespace EquationFinder.Screens
 
         }
 
-        private void SelectNewOperator(Move move, GameTime gameTime)
+        private void SelectNewOperator()
         {
 
             //add the current equation to the list
@@ -705,8 +668,13 @@ namespace EquationFinder.Screens
             var result = this.IsValidNumberMove(gameTime);
 
             //if we have a valid move
-            if (result == SelectActionResult.SUCCESS)
+            if (result == SelectActionResult.SUCCESS
+                || result == SelectActionResult.OPERATOR_FIRST)
             {
+
+                //if the user forgot to set an operator, assume they meant to put a '+' and then select the letter
+                if (result == SelectActionResult.OPERATOR_FIRST)
+                    this.SelectNewOperator();
 
                 //add the current equation to the list
                 _undoEquations.Add(_currentEquation);
@@ -734,9 +702,9 @@ namespace EquationFinder.Screens
             {
 
                 //set the flash text
-                if (result == SelectActionResult.OPERATOR_FIRST) 
+                if (result == SelectActionResult.OPERATOR_FIRST)
                     this._flashText.SetFlashText("You must select an operator first.", gameTime.TotalGameTime.TotalMilliseconds, true, true);
-                else if (result == SelectActionResult.ALREADY_SELECTED) 
+                else if (result == SelectActionResult.ALREADY_SELECTED)
                     this._flashText.SetFlashText("Number already selected.", gameTime.TotalGameTime.TotalMilliseconds, true, true);
                 else if (result == SelectActionResult.NOT_CONNECTED)
                     this._flashText.SetFlashText("Numbers must be connected.", gameTime.TotalGameTime.TotalMilliseconds, true, true);
@@ -907,7 +875,7 @@ namespace EquationFinder.Screens
                 var undoType = _undoType[_undoType.Count() - 1];
                 if (undoType == "Number" || undoType == "Right Parenthesis")
                 {
-                    this.PlaySound(_incorrectSound, gameTime);
+                    this.PlaySound(_correctSound, gameTime);
                     return SelectActionResult.OPERATOR_FIRST;
                 }
 
@@ -1117,10 +1085,6 @@ namespace EquationFinder.Screens
 
                 this.AddOperation(gameTime, move);
 
-            }
-            else if (move.Name == "Select")
-            {
-                this.SelectNumber(gameTime);
             }
             else if (move.Name == "Evaluate")
             {
