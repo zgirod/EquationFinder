@@ -28,6 +28,7 @@ namespace EquationFinder
         ScreenManager screenManager;
 
         private bool _asyncFinsihed;
+        private bool _loadFinsihed;
         public static IAsyncSaveDevice _saveDevice;
         public static bool IsTrailMode;
 
@@ -86,7 +87,9 @@ namespace EquationFinder
             GameplayOptions.PlayMusic = "Battle";
             GameplayOptions.StartNumber = 19;
             GameplayOptions.BackgroundImage = "Map";
-            screenManager.AddScreen(new MainMenuScreen());
+            
+            //load the loading screen
+            LoadingScreen.Load(screenManager, true, null, null);
 
             //set whether we are in a trail mode or not
             EquationFinderGame.IsTrailMode = Guide.IsTrialMode;
@@ -161,6 +164,21 @@ namespace EquationFinder
                         _asyncFinsihed = true;
 
                     });
+
+            }
+            else if (_saveDevice.IsReady && _loadFinsihed == false)
+            {
+
+                _loadFinsihed = true;
+
+                if (StorageHelper.IsHowToFinished())
+                {
+                    LoadingScreen.Load(screenManager, true, null, new ControlsScreen(true));
+                }
+                else
+                {
+                    LoadingScreen.Load(screenManager, true, null, new MainMenuScreen());
+                }
 
             }
 

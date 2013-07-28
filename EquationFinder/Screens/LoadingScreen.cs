@@ -85,12 +85,17 @@ namespace EquationFinder.Screens
             {
                 ScreenManager.RemoveScreen(this);
 
-                foreach (GameScreen screen in screensToLoad)
+                if (screensToLoad != null)
                 {
-                    if (screen != null)
+
+                    foreach (GameScreen screen in screensToLoad)
                     {
-                        ScreenManager.AddScreen(screen);
+                        if (screen != null)
+                        {
+                            ScreenManager.AddScreen(screen);
+                        }
                     }
+
                 }
 
                 // Once the load has finished, we use ResetElapsedTime to tell

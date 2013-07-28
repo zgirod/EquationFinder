@@ -31,7 +31,8 @@ namespace EquationFinder.Screens
         NOT_CONNECTED,
         OPERATOR_FIRST,
         ALREADY_SELECTED,
-        SUCCESS
+        SUCCESS,
+        TOO_LONG
     }
 
     public class GameplayScreen : GameScreen
@@ -233,9 +234,10 @@ namespace EquationFinder.Screens
 
 
             // Draw the score
-            spriteBatch.DrawString(_gameFont, "Target: " + _target, new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 30, ScreenManager.GraphicsDevice.Viewport.Y + 10), this._colorPalatte.DisplayText);
-            spriteBatch.DrawString(_gameFont, "Equation: " + _currentEquation, new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 30, ScreenManager.GraphicsDevice.Viewport.Y + 40), this._colorPalatte.DisplayText);
-            spriteBatch.DrawString(_gameFont, "Score: " + string.Format("{0:n0}", this._score), new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 30, ScreenManager.GraphicsDevice.Viewport.Y + 70), this._colorPalatte.DisplayText);
+            spriteBatch.DrawString(_gameFont, "Target: " + _target, new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 35, ScreenManager.GraphicsDevice.Viewport.Y + 10), this._colorPalatte.DisplayText);
+            spriteBatch.DrawString(_gameFont, "Score: " + string.Format("{0:n0}", this._score), new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 35, ScreenManager.GraphicsDevice.Viewport.Y + 40), this._colorPalatte.DisplayText);
+            spriteBatch.DrawString(_gameFont, "Equation: " + _currentEquation, new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 35, ScreenManager.GraphicsDevice.Viewport.Y + 70), this._colorPalatte.DisplayText);
+            
 
             //get the time string
             var time = "Time:   " + _clock.displayClock;
@@ -301,10 +303,17 @@ namespace EquationFinder.Screens
 
                 
                 //display the text
+                //spriteBatch.DrawString(
+                //    _gameFont,
+                //    _flashText.Text,
+                //    new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, ScreenManager.GraphicsDevice.Viewport.Y + 50f) - (textSize / 2),
+                //    (_flashText.IsErrorText) ? this._colorPalatte.FlashTextIncorrect : this._colorPalatte.FlashTextCorrect);
+
+                //display the text
                 spriteBatch.DrawString(
                     _gameFont,
                     _flashText.Text,
-                    new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, ScreenManager.GraphicsDevice.Viewport.Y + 50f) - (textSize / 2),
+                    new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, ScreenManager.GraphicsDevice.Viewport.Height - 50f) - (textSize / 2),
                     (_flashText.IsErrorText) ? this._colorPalatte.FlashTextIncorrect : this._colorPalatte.FlashTextCorrect);
 
             }
@@ -702,8 +711,8 @@ namespace EquationFinder.Screens
             {
 
                 //set the flash text
-                if (result == SelectActionResult.OPERATOR_FIRST)
-                    this._flashText.SetFlashText("You must select an operator first.", gameTime.TotalGameTime.TotalMilliseconds, true, true);
+                if (result == SelectActionResult.TOO_LONG)
+                    this._flashText.SetFlashText("The equation maximum is 15 numbers.", gameTime.TotalGameTime.TotalMilliseconds, true, true);
                 else if (result == SelectActionResult.ALREADY_SELECTED)
                     this._flashText.SetFlashText("Number already selected.", gameTime.TotalGameTime.TotalMilliseconds, true, true);
                 else if (result == SelectActionResult.NOT_CONNECTED)
@@ -718,12 +727,12 @@ namespace EquationFinder.Screens
 
             //we need to calculate the start point for the x and y axis
             int width, height, x, y;
-            width = _boardSize * 50;
-            height = _boardSize * 35;
+            width = _boardSize * 48;
+            height = _boardSize * 33;
 
             //get our starting X,Y position
             x = (ScreenManager.GraphicsDevice.Viewport.Width / 2) - (width / 2);
-            y = (ScreenManager.GraphicsDevice.Viewport.Height / 9 * 5) - (height / 2);
+            y = (int)((decimal)ScreenManager.GraphicsDevice.Viewport.Height * 0.56m) - (height / 2);
 
             // start at 175, 175
             Vector2 position = new Vector2(x, y);
@@ -866,6 +875,13 @@ namespace EquationFinder.Screens
                 //play the bad sound
                 this.PlaySound(_incorrectSound, gameTime);
                 return SelectActionResult.NOT_CONNECTED;
+            }
+
+
+            if (_undoType.Where(x => x == "Number").Count() >= 15)
+            {
+                this.PlaySound(_incorrectSound, gameTime);
+                return SelectActionResult.TOO_LONG;
             }
 
             //Check to make sure this is a valid move for a number

@@ -19,6 +19,13 @@ namespace EquationFinder.Helpers
             return string.Format("HighScores{0}.txt", boardSize);
         }
 
+        public static bool IsHowToFinished()
+        {
+
+            return !EquationFinderGame._saveDevice.FileExists("EquationFinder", "HowToFinish.txt");
+
+        }
+
         public static void SaveInitials(string initials)
         {
 
@@ -74,6 +81,13 @@ namespace EquationFinder.Helpers
 
             EquationFinderGame.SaveFile(_gameSettingsFileName, fileContents);
 
+
+        }
+
+        public static void SaveHowToFinished()
+        {
+
+            EquationFinderGame.SaveFile("HowToFinish.txt", "");
 
         }
 

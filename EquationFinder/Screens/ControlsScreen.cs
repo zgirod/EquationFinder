@@ -20,13 +20,21 @@ namespace EquationFinder.Screens
         SpriteFont _gameFont;
         Texture2D _texture;
         Texture2D[] _controls;
-        int screenCount = 0;
+        int _screenCount = 0;
+        bool _isFirstTimePlaying;
 
         public GamePadState GamePadState { get; private set; }
         public KeyboardState KeyboardState { get; private set; }
 
-        public ControlsScreen()
+        public ControlsScreen(bool isFirstTimePlaying)
         {
+
+            _isFirstTimePlaying = isFirstTimePlaying;
+
+            if (isFirstTimePlaying)
+                _screenCount = 0;
+            else
+                _screenCount = 1;
 
         }
 
@@ -70,12 +78,12 @@ namespace EquationFinder.Screens
                     ScreenManager.GraphicsDevice.Viewport.Height), Color.White);
 
             //draw the controllers images
-            spriteBatch.Draw(_controls[screenCount],
+            spriteBatch.Draw(_controls[_screenCount],
                 new Rectangle(
-                    (ScreenManager.GraphicsDevice.Viewport.Width / 2) - (_controls[screenCount].Width / 2),
-                    (ScreenManager.GraphicsDevice.Viewport.Height / 2) - (_controls[screenCount].Height / 2),
-                    _controls[screenCount].Width,
-                    _controls[screenCount].Height), Color.White);
+                    (ScreenManager.GraphicsDevice.Viewport.Width / 2) - (_controls[_screenCount].Width / 2),
+                    (ScreenManager.GraphicsDevice.Viewport.Height / 2) - (_controls[_screenCount].Height / 2),
+                    _controls[_screenCount].Width,
+                    _controls[_screenCount].Height), Color.White);
 
             // stop drawing
             spriteBatch.End();
@@ -95,7 +103,7 @@ namespace EquationFinder.Screens
             //load all the images 
             _controls = new Texture2D[21];
             for (int i = 0; i < 21; i++)
-                _controls[i] = _content.Load<Texture2D>("img/howto/" + (i+1).ToString());
+                _controls[i] = _content.Load<Texture2D>("img/howto/" + (i).ToString());
 
             // Load the score font
             _gameFont = _content.Load<SpriteFont>("gameFont");
@@ -116,16 +124,20 @@ namespace EquationFinder.Screens
 
             //if we want to go back
             if (move.Name == "A")
-                screenCount++;
+                _screenCount++;
             else if (move.Name == "B")
-                screenCount--;
+                _screenCount--;
 
             //do not allow the screen count to go below 0
-            if (screenCount < 0) screenCount = 0;
+            if (_isFirstTimePlaying && _screenCount < 0) _screenCount = 0;
+            if (!_isFirstTimePlaying && _screenCount < 1) _screenCount = 1;
 
             //if we have gone through all the screen, go back to the main menu
-            if (this.screenCount >= _controls.Count())
+            if (this._screenCount >= _controls.Count())
+            {
+                StorageHelper.SaveHowToFinished();
                 LoadingScreen.Load(ScreenManager, true, null, new MainMenuScreen());
+            }
 
             base.HandleMove(gameTime, move);
         }
@@ -133,16 +145,21 @@ namespace EquationFinder.Screens
         private void HandleDirection(Buttons direction)
         {
             if (direction.Equals(Buttons.DPadRight) || direction.Equals(Buttons.LeftThumbstickRight))
-                screenCount++;
+                _screenCount++;
             else if (direction.Equals(Buttons.DPadLeft) || direction.Equals(Buttons.LeftThumbstickLeft))
-                screenCount--;
+                _screenCount--;
 
             //do not allow the screen count to go below 0
-            if (screenCount < 0) screenCount = 0;
+            //do not allow the screen count to go below 0
+            if (_isFirstTimePlaying && _screenCount < 0) _screenCount = 0;
+            if (!_isFirstTimePlaying && _screenCount < 1) _screenCount = 1;
 
             //if we have gone through all the screen, go back to the main menu
-            if (this.screenCount >= _controls.Count())
+            if (this._screenCount >= _controls.Count())
+            {
+                StorageHelper.SaveHowToFinished();
                 LoadingScreen.Load(ScreenManager, true, null, new MainMenuScreen());
+            }
 
         }
 

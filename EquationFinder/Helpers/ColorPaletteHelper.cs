@@ -66,7 +66,7 @@ namespace EquationFinder.Helpers
                     BoardTextSelected = Color.Violet,
                     BoardTextPreviouslySelected = Color.Green,
                     DisplayText = Color.DarkRed,
-                    FlashTextCorrect = Color.Green,
+                    FlashTextCorrect = Color.LawnGreen,
                     FlashTextIncorrect = Color.DarkRed,
                     PausedMenuTextSelected = Color.Red,
                     PausedMenuTextUnselected = Color.Black
@@ -95,7 +95,7 @@ namespace EquationFinder.Helpers
                     BoardTextPreviouslySelected = Color.Blue,
                     DisplayText = Color.WhiteSmoke,
                     FlashTextCorrect = Color.LawnGreen,
-                    FlashTextIncorrect = Color.OrangeRed,
+                    FlashTextIncorrect = Color.DarkRed,
                     PausedMenuTextSelected = Color.DarkRed,
                     PausedMenuTextUnselected = Color.Black
                 };
