@@ -197,7 +197,7 @@ namespace EquationFinder.Screens
 
             //add some text
             y = AddTextToList("Q: How do I go to the next number?", y, false, true);
-            y = AddTextToList("This is the target number divided by 3.", y, true, true);
+            y = AddTextToList("By getting a certain number of correct equations.  The number of correct equations needed is the target number divided by 3.", y, true, true);
             y = AddTextToList("Q: What do I get in the trail mode?", y, false, true);
             y = AddTextToList("You get to play the full game however to don't get to go to the next number when your round ends.  In the full game you get to go to the next number if you get enough equations correct.", y, true, true);
             y = AddTextToList("Q: How are scores calculated?", y, false, true);
