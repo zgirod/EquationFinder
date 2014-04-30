@@ -119,6 +119,8 @@ namespace EquationFinder.Screens
             this._isPaused = false;
             this._pasuedMenuCount = 1;
             this._roundTarget = Convert.ToInt32(Math.Floor(this._target / 3f));
+            if (_roundTarget < 1)
+                _roundTarget = 1;
 
         }
 
@@ -237,7 +239,6 @@ namespace EquationFinder.Screens
             spriteBatch.DrawString(_gameFont, "Target: " + _target, new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 35, ScreenManager.GraphicsDevice.Viewport.Y + 10), this._colorPalatte.DisplayText);
             spriteBatch.DrawString(_gameFont, "Score: " + string.Format("{0:n0}", this._score), new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 35, ScreenManager.GraphicsDevice.Viewport.Y + 40), this._colorPalatte.DisplayText);
             spriteBatch.DrawString(_gameFont, "Equation: " + _currentEquation, new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 35, ScreenManager.GraphicsDevice.Viewport.Y + 70), this._colorPalatte.DisplayText);
-            
 
             //get the time string
             var time = "Time:   " + _clock.displayClock;
@@ -292,22 +293,6 @@ namespace EquationFinder.Screens
 
                 //calculate where the flash text goes
                 Vector2 textSize = _gameFont.MeasureString(_flashText.Text);
-
-                
-                    //this will set the text on the bottom
-                    //spriteBatch.DrawString(
-                    //    _gameFont,
-                    //    _flashText.Text,
-                    //    new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, ScreenManager.GraphicsDevice.Viewport.Height - 50f) - (textSize / 2),
-                    //    this._colorPalatte.FlashTextIncorrect);
-
-                
-                //display the text
-                //spriteBatch.DrawString(
-                //    _gameFont,
-                //    _flashText.Text,
-                //    new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, ScreenManager.GraphicsDevice.Viewport.Y + 50f) - (textSize / 2),
-                //    (_flashText.IsErrorText) ? this._colorPalatte.FlashTextIncorrect : this._colorPalatte.FlashTextCorrect);
 
                 //display the text
                 spriteBatch.DrawString(
@@ -430,8 +415,6 @@ namespace EquationFinder.Screens
                 }
                 
             }
-
-            _clock.SetTime(60);
 
             GamePadState lastGamePadState = GamePadState;
             KeyboardState lastKeyboardState = KeyboardState;
@@ -1248,21 +1231,6 @@ namespace EquationFinder.Screens
         #endregion
 
         #region High Score Methods
-
-        //public void SaveHighScores(string initials)
-        //{
-
-        //    //add the new high score object
-        //    _highScores.Add(new HighScore() 
-        //    {
-        //        Initials = string.Format("{0} ({1})", initials, _startingNumber),
-        //        Score = _score
-        //    });
-
-        //    //save the file
-        //    StorageHelper.SaveHighScores(_highScores, _boardSize);
-
-        //}
 
         public List<HighScore> LoadHighScores()
         {

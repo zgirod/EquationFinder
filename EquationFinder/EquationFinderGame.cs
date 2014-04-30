@@ -129,7 +129,14 @@ namespace EquationFinder
             if (_saveDevice.IsReady && _asyncFinsihed == false)
             {
 
-                _saveDevice.LoadAsync(
+                //if the game setting file doesn't exist, we don't need to load it
+                if (!EquationFinderGame._saveDevice.FileExists("EquationFinder", StorageHelper._gameSettingsFileName))
+                {
+                    _asyncFinsihed = true;
+                    return;
+                }
+
+                _saveDevice.Load(
                     "EquationFinder",
                     StorageHelper._gameSettingsFileName,
                     file =>
@@ -173,7 +180,7 @@ namespace EquationFinder
 
                 if (StorageHelper.IsHowToFinished())
                 {
-                    LoadingScreen.Load(screenManager, true, null, new ControlsScreen(true));
+                    LoadingScreen.Load(screenManager, true, null, new ControlsScreen());
                 }
                 else
                 {

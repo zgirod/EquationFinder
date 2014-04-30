@@ -106,7 +106,7 @@ namespace EquationFinder.Screens
             {
 
                 //load the controls screen
-                LoadingScreen.Load(ScreenManager, true, null, new ControlsScreen(false));
+                LoadingScreen.Load(ScreenManager, true, null, new ControlsScreen());
 
             }
 

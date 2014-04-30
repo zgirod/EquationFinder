@@ -69,11 +69,18 @@ namespace EasyStorage
 				// open a container
 				using (StorageContainer currentContainer = OpenContainer(containerName))
 				{
-					// attempt the load
-					using (var stream = currentContainer.OpenFile(fileName, FileMode.Open))
-					{
-						loadAction(stream);
-					}
+
+                    //if the file exists
+                    if (currentContainer.FileExists(fileName))
+                    {
+
+                        // attempt the load
+                        using (var stream = currentContainer.OpenFile(fileName, FileMode.Open))
+                        {
+                            loadAction(stream);
+                        }
+
+                    }
 				}
 			}
 		}

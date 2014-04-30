@@ -21,21 +21,13 @@ namespace EquationFinder.Screens
         Texture2D _texture;
         Texture2D[] _controls;
         int _screenCount = 0;
-        bool _isFirstTimePlaying;
 
         public GamePadState GamePadState { get; private set; }
         public KeyboardState KeyboardState { get; private set; }
 
-        public ControlsScreen(bool isFirstTimePlaying)
+        public ControlsScreen()
         {
-
-            _isFirstTimePlaying = isFirstTimePlaying;
-
-            if (isFirstTimePlaying)
-                _screenCount = 0;
-            else
-                _screenCount = 1;
-
+            _screenCount = 0;
         }
 
         #region Public Override Methods
@@ -101,8 +93,8 @@ namespace EquationFinder.Screens
             _texture = _content.Load<Texture2D>("img/bg/Fibers");
             
             //load all the images 
-            _controls = new Texture2D[21];
-            for (int i = 0; i < 21; i++)
+            _controls = new Texture2D[17];
+            for (int i = 0; i < 17; i++)
                 _controls[i] = _content.Load<Texture2D>("img/howto/" + (i).ToString());
 
             // Load the score font
@@ -129,8 +121,7 @@ namespace EquationFinder.Screens
                 _screenCount--;
 
             //do not allow the screen count to go below 0
-            if (_isFirstTimePlaying && _screenCount < 0) _screenCount = 0;
-            if (!_isFirstTimePlaying && _screenCount < 1) _screenCount = 1;
+            if (_screenCount < 0) _screenCount = 0;
 
             //if we have gone through all the screen, go back to the main menu
             if (this._screenCount >= _controls.Count())
@@ -151,8 +142,7 @@ namespace EquationFinder.Screens
 
             //do not allow the screen count to go below 0
             //do not allow the screen count to go below 0
-            if (_isFirstTimePlaying && _screenCount < 0) _screenCount = 0;
-            if (!_isFirstTimePlaying && _screenCount < 1) _screenCount = 1;
+            if (_screenCount < 0) _screenCount = 0;
 
             //if we have gone through all the screen, go back to the main menu
             if (this._screenCount >= _controls.Count())
