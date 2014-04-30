@@ -228,12 +228,10 @@ namespace EquationFinder.Screens
             spriteBatch.DrawString(_gameFont, "Resume Game", new Vector2(x - Convert.ToInt32(_gameFont.MeasureString("Resume Game").Length()), y), _pasuedMenuCount == 1 ? _colorPalatte.PausedMenuTextSelected : _colorPalatte.PausedMenuTextUnselected);
             spriteBatch.DrawString(_gameFont, "Exit to menu", new Vector2(x - Convert.ToInt32(_gameFont.MeasureString("Exit to menu").Length()), y + 50), _pasuedMenuCount == 2 ? _colorPalatte.PausedMenuTextSelected : _colorPalatte.PausedMenuTextUnselected);
 
-
         }
 
         private void DrawGame(SpriteBatch spriteBatch, GameTime gameTime)
         {
-
 
             // Draw the score
             spriteBatch.DrawString(_gameFont, "Target: " + _target, new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 35, ScreenManager.GraphicsDevice.Viewport.Y + 10), this._colorPalatte.DisplayText);
@@ -254,8 +252,10 @@ namespace EquationFinder.Screens
             var remaining = "Next Level: ";
             if (EquationFinderGame.IsTrailMode)
                 remaining += "N/A";
-            else
+            else if (Math.Max(this._roundTarget - this._roundCorrect, 0) > 0)
                 remaining += string.Format("{0:n0}", Math.Max(this._roundTarget - this._roundCorrect, 0));
+            else
+                remaining += "unlocked";
 
             stringSize = _gameFont.MeasureString(remaining);
             spriteBatch.DrawString(_gameFont, remaining, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width - stringSize.Length() - 30, ScreenManager.GraphicsDevice.Viewport.Y + 40), this._colorPalatte.DisplayText);
@@ -353,7 +353,7 @@ namespace EquationFinder.Screens
                     _clock.CheckTime(gameTime);
 
                     //check to see if we qualified for the next round
-                    if (_clock.displayClock == "Game Over" && this._roundCorrect >= this._roundTarget  && EquationFinderGame.IsTrailMode == false)
+                    if (_clock.displayClock == "Game Over" && this._roundCorrect >= this._roundTarget && EquationFinderGame.IsTrailMode == false)
                     {
 
                         //go to the next round
@@ -365,6 +365,8 @@ namespace EquationFinder.Screens
                         //reset the round count
                         this._roundCorrect = 0;
                         this._roundTarget = Convert.ToInt32(Math.Floor(this._target / 3f));
+                        if (_roundTarget < 1)
+                            _roundTarget = 1;
 
                         //set the flash text
                         _flashText.Text = string.Format("Next Level {0}", _target);
