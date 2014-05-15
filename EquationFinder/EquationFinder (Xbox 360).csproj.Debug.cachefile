@@ -10,12 +10,7 @@ Content\img\howto\13.xnb
 Content\img\howto\14.xnb
 Content\img\howto\15.xnb
 Content\img\howto\16.xnb
-Content\img\howto\17.xnb
-Content\img\howto\18.xnb
-Content\img\howto\19.xnb
 Content\img\howto\2.xnb
-Content\img\howto\20.xnb
-Content\img\howto\21.xnb
 Content\img\howto\3.xnb
 Content\img\howto\4.xnb
 Content\img\howto\5.xnb
@@ -27,6 +22,7 @@ Content\img\bg\Color.xnb
 Content\img\bg\Round_Dreams.xnb
 Content\img\bg\Smoke.xnb
 Content\img\bg\Wood.xnb
+Content\img\howto\0.xnb
 Content\gameFont.xnb
 Content\menufont.xnb
 Content\boardFont.xnb
@@ -35,7 +31,7 @@ Content\sound\incorrect.xnb
 Content\sound\BattleTheme.xnb
 Content\sound\DungeonTheme.xnb
 Content\sound\ForestTheme.xnb
-Content\img\howto\0.xnb
+Content\img\howto\17.xnb
 Content\sound\BattleTheme.wma
 Content\sound\DungeonTheme.wma
 Content\sound\ForestTheme.wma

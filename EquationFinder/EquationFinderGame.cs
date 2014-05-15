@@ -70,11 +70,6 @@ namespace EquationFinder
             // prompt for a device on the first Update we can
             sharedSaveDevice.PromptForDevice();
 
-//#if XBOX
-//            // add the GamerServicesComponent
-//            Components.Add(new Microsoft.Xna.Framework.GamerServices.GamerServicesComponent(this));
-//#endif
-
             //add the screen manager as a component
             Components.Add(screenManager);
 

@@ -93,8 +93,8 @@ namespace EquationFinder.Screens
             _texture = _content.Load<Texture2D>("img/bg/Fibers");
             
             //load all the images 
-            _controls = new Texture2D[17];
-            for (int i = 0; i < 17; i++)
+            _controls = new Texture2D[18];
+            for (int i = 0; i < 18; i++)
                 _controls[i] = _content.Load<Texture2D>("img/howto/" + (i).ToString());
 
             // Load the score font

@@ -112,7 +112,6 @@ namespace EquationFinder.Screens
 
         }
 
-
-
     }
+
 }

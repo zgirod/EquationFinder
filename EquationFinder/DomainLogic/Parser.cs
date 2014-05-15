@@ -16,7 +16,7 @@ namespace EquationFinder.DomainLogic
         {
 
             //set the equation
-            equation = equation.Replace(" ", "").Trim(); ;
+            equation = equation.Replace(" ", "").Trim();
 
             //parse out the equation
             equation = Parser.ProcessParenthesis(equation);
@@ -175,7 +175,7 @@ namespace EquationFinder.DomainLogic
                     && (!Char.IsNumber(equation[index + subEquation.Length])))) //this line makes sure the right side of the equation is not a number 
                 {
 
-                    //if we have values to th eleft
+                    //if we have values to the left
                     if (index > 0)
                         tempEquation = equation.Substring(0, index);
                     else
@@ -204,9 +204,8 @@ namespace EquationFinder.DomainLogic
             }
             while (index >= 0);
 
-
+            //return the equation
             return equation;
-
 
         }
 
