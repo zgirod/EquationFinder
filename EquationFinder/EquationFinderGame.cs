@@ -171,16 +171,9 @@ namespace EquationFinder
             else if (_saveDevice.IsReady && _loadFinsihed == false)
             {
 
+				//mark that we finished loading and load the main menu screen
                 _loadFinsihed = true;
-
-                if (StorageHelper.IsHowToFinished())
-                {
-                    LoadingScreen.Load(screenManager, true, null, new ControlsScreen());
-                }
-                else
-                {
-                    LoadingScreen.Load(screenManager, true, null, new MainMenuScreen());
-                }
+				LoadingScreen.Load(screenManager, true, null, new MainMenuScreen());
 
             }
 

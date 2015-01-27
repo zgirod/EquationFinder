@@ -21,9 +21,7 @@ namespace EquationFinder.Helpers
 
         public static bool IsHowToFinished()
         {
-
-            return !EquationFinderGame._saveDevice.FileExists("EquationFinder", "HowToFinish.txt");
-
+            return EquationFinderGame._saveDevice.FileExists("EquationFinder", "HowToFinish.txt");
         }
 
         public static void SaveInitials(string initials)

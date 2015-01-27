@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using EquationFinder;
+using EquationFinder.Helpers;
+using Microsoft.Xna.Framework;
+using EquationFinder.Input;
 
 namespace EquationFinder.Screens
 {
@@ -15,15 +18,30 @@ namespace EquationFinder.Screens
         public MainMenuScreen() : base("Equation Finder")
         {
 
+            var menuEntry = new MenuEntry("", "");
+
+			//if we haven't finished the how to, make it first in the list
+			if (StorageHelper.IsHowToFinished() == false)
+			{
+				//add the controls option
+				menuEntry = new MenuEntry("Controls", "Controls");
+				menuEntry.Selected += MenuEntry_Selected;
+				MenuEntries.Add(menuEntry);
+			}
+		
             //add the play game
-            var menuEntry = new MenuEntry("Play Game", "Play");
+            menuEntry = new MenuEntry("Play Game", "Play");
             menuEntry.Selected += MenuEntry_Selected;
             MenuEntries.Add(menuEntry);
 
-            //add the controls option
-            menuEntry = new MenuEntry("Controls", "Controls");
-            menuEntry.Selected += MenuEntry_Selected;
-            MenuEntries.Add(menuEntry);
+            //if we have finished the how to, make it second in the list
+			if (StorageHelper.IsHowToFinished() == true)
+			{
+				//add the controls option
+				menuEntry = new MenuEntry("Controls", "Controls");
+				menuEntry.Selected += MenuEntry_Selected;
+				MenuEntries.Add(menuEntry);
+			}
 
             //add the how it works option
             menuEntry = new MenuEntry("F.A.Q", "FAQ");
@@ -56,7 +74,10 @@ namespace EquationFinder.Screens
         {
 
             //set our qui type
-            var key = ((MenuEntry)sender).Key;
+            var menuEntry = ((MenuEntry)sender);
+            if (menuEntry == null)
+                return;
+            var key = menuEntry.Key;
 
             //if we want to play
             if (key == "Play")
@@ -110,6 +131,16 @@ namespace EquationFinder.Screens
 
             }
 
+        }
+
+        public override void HandleMove(GameTime gameTime, Move move)
+        {
+
+            //if we hit the back button, don't do anything
+            if (move.Name.ToLower() == "b")
+                return;
+
+            base.HandleMove(gameTime, move);
         }
 
     }
