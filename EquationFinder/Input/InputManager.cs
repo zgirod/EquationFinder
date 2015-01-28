@@ -33,6 +33,7 @@ namespace EquationFinder.Input
         /// performing the rest of the move after they forgot about the first half.
         /// </summary>
         public readonly TimeSpan BufferTimeOut = TimeSpan.FromMilliseconds(500);
+        public readonly TimeSpan DirectionBufferTimeOut = TimeSpan.FromMilliseconds(800);
 
         
         /// <summary>
@@ -122,14 +123,22 @@ namespace EquationFinder.Input
             var direction = Direction.FromInput(GamePadState, KeyboardState);
             if (Direction.FromInput(lastGamePadState, lastKeyboardState) != direction)
             {
-                // combine the direction with the buttons.
-                buttons |= direction;
+
+                //if we are doing a direction and we are greater then the timeout, clear the buffer
+                if (timeSinceLast > DirectionBufferTimeOut)
+                {
+
+                    // combine the direction with the buttons.
+                    buttons |= direction;
+
+                }
 
                 // Don't merge two different directions. This avoids having impossible
                 // directions such as Left+Up+Right. This also has the side effect that
                 // the direction needs to be pressed at the same time or slightly before
                 // the buttons for merging to work.
                 mergeInput = false;
+
             }
 
             // If there was any new input on this update, add it to the buffer.

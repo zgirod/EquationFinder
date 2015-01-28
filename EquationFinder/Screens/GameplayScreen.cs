@@ -64,7 +64,7 @@ namespace EquationFinder.Screens
         bool _loadedHighScores;
         List<HighScore> _highScores;
         Int64 _highScoreToBeat = 0;
-        int _secondsPerRound = 60;
+        int _secondsPerRound = 90;
         int _secondForCorrectAnswer = 5;
         bool _isPaused;
         int _pasuedMenuCount;
@@ -234,9 +234,9 @@ namespace EquationFinder.Screens
         {
 
             // Draw the score
-            spriteBatch.DrawString(_gameFont, "Target: " + _target, new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 35, ScreenManager.GraphicsDevice.Viewport.Y + 10), this._colorPalatte.DisplayText);
-            spriteBatch.DrawString(_gameFont, "Score: " + string.Format("{0:n0}", this._score), new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 35, ScreenManager.GraphicsDevice.Viewport.Y + 40), this._colorPalatte.DisplayText);
-            spriteBatch.DrawString(_gameFont, "Equation: " + _currentEquation, new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 35, ScreenManager.GraphicsDevice.Viewport.Y + 70), this._colorPalatte.DisplayText);
+            spriteBatch.DrawString(_gameFont, "Target: " + _target, new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 40, ScreenManager.GraphicsDevice.Viewport.Y + 10), this._colorPalatte.DisplayText);
+            spriteBatch.DrawString(_gameFont, "Score: " + string.Format("{0:n0}", this._score), new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 40, ScreenManager.GraphicsDevice.Viewport.Y + 40), this._colorPalatte.DisplayText);
+            spriteBatch.DrawString(_gameFont, "Equation: " + _currentEquation, new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 40, ScreenManager.GraphicsDevice.Viewport.Y + 70), this._colorPalatte.DisplayText);
 
             //get the time string
             var time = "Time:   " + _clock.displayClock;
@@ -245,7 +245,7 @@ namespace EquationFinder.Screens
 
             //draw the space need for the time string
             Vector2 stringSize = _gameFont.MeasureString(time);
-            spriteBatch.DrawString(_gameFont, time, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width - stringSize.Length() - 30,
+            spriteBatch.DrawString(_gameFont, time, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width - stringSize.Length() - 40,
                 ScreenManager.GraphicsDevice.Viewport.Y + 10), this._colorPalatte.DisplayText);
 
             //if they are in trail mode, show N/A
@@ -258,7 +258,7 @@ namespace EquationFinder.Screens
                 remaining += "unlocked";
 
             stringSize = _gameFont.MeasureString(remaining);
-            spriteBatch.DrawString(_gameFont, remaining, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width - stringSize.Length() - 30, ScreenManager.GraphicsDevice.Viewport.Y + 40), this._colorPalatte.DisplayText);
+            spriteBatch.DrawString(_gameFont, remaining, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width - stringSize.Length() - 40, ScreenManager.GraphicsDevice.Viewport.Y + 40), this._colorPalatte.DisplayText);
 
             int row = 0, col = 0;
             while (row < this._boardSize)

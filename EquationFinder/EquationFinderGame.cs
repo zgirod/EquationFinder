@@ -194,7 +194,6 @@ namespace EquationFinder
         public static void SaveFile(string fileName, string fileContents) 
         {
 
-
             // make sure the device is ready
             if (_saveDevice.IsReady)
             {

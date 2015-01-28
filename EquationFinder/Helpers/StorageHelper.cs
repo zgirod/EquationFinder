@@ -21,6 +21,10 @@ namespace EquationFinder.Helpers
 
         public static bool IsHowToFinished()
         {
+
+            if (EquationFinderGame._saveDevice.IsReady == false)
+                return false;
+            
             return EquationFinderGame._saveDevice.FileExists("EquationFinder", "HowToFinish.txt");
         }
 
@@ -92,6 +96,9 @@ namespace EquationFinder.Helpers
         public static void SaveHighScores(List<HighScore> highScores, int boardSize)
         {
 
+            if (EquationFinderGame._saveDevice.IsReady == false)
+                return;
+
             //get the right file name
             var fileName = StorageHelper.HighScroreFileName(boardSize);
 
@@ -107,6 +114,9 @@ namespace EquationFinder.Helpers
 
         public static List<HighScore> LoadHighScores(int boardSize)
         {
+
+            if (EquationFinderGame._saveDevice.IsReady == false)
+                return new List<HighScore>();
 
             var highScores = new List<HighScore>();
             var fileName = StorageHelper.HighScroreFileName(boardSize);
