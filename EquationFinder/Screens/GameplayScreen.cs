@@ -85,10 +85,23 @@ namespace EquationFinder.Screens
         public GamePadState GamePadState { get; private set; }
         public KeyboardState KeyboardState { get; private set; }
 
+        /// <summary>
+        /// The last "real time" that new input was received. Slightly late button
+        /// presses will not update this time; they are merged with previous input.
+        /// </summary>
+        public TimeSpan LastDirectionalInputTime { get; private set; }
+
         #region Initialization
 
         public GameplayScreen(int target)
         {
+
+            //if the target is less than 0, create a random target
+            if (target < 0)
+            {
+                var random = new Random();
+                target = random.Next(11, 50);
+            }
 
             //setup the transitions
             TransitionOnTime = TimeSpan.FromSeconds(1.5);
@@ -423,11 +436,19 @@ namespace EquationFinder.Screens
             GamePadState = InputHelpers.GetGamePadStateForAllPLayers();
             KeyboardState = InputHelpers.GetKeyboardStateForAllPLayers();
 
+            TimeSpan time = gameTime.TotalGameTime;
+            TimeSpan timeSinceLast = time - LastDirectionalInputTime;
+
             //get the direction
             var direction = Direction.FromInput(GamePadState, KeyboardState);
-            if (Direction.FromInput(lastGamePadState, lastKeyboardState) != direction && direction != 0.0)
+            if (Direction.FromInput(lastGamePadState, lastKeyboardState) != direction
+                && direction != 0.0
+                && timeSinceLast > TimeSpan.FromMilliseconds(125))
+            {
+                LastDirectionalInputTime = time;
                 this.HandleDirection(direction);
-
+            }
+                
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
 
         }

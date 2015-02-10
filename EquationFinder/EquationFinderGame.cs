@@ -80,8 +80,8 @@ namespace EquationFinder
             GameplayOptions.BoardSize = 5;
             GameplayOptions.PlaySoundEffects = true;
             GameplayOptions.PlayMusic = "Battle";
-            GameplayOptions.StartNumber = 19;
-            GameplayOptions.BackgroundImage = "Map";
+            GameplayOptions.StartNumber = -1;
+            GameplayOptions.BackgroundImage = "Midnight_Black";
             
             //load the loading screen
             LoadingScreen.Load(screenManager, true, null, null);

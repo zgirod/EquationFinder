@@ -79,7 +79,9 @@ namespace EquationFinder.Screens
             spriteBatch.DrawString(_gameFont, string.Format("Board Size:   {0}", GameplayOptions.BoardSize), new Vector2(x, y), row == 1 ? Color.Blue : Color.Black);
             spriteBatch.DrawString(_gameFont, string.Format("Play Sound Effects:   {0}", GameplayOptions.PlaySoundEffects ? "Yes" : "No"), new Vector2(x, y + 50), row == 2 ? Color.Blue : Color.Black);
             spriteBatch.DrawString(_gameFont, string.Format("Play Music:   {0}", GameplayOptions.PlayMusic), new Vector2(x, y + 100), row == 3 ? Color.Blue : Color.Black);
-            spriteBatch.DrawString(_gameFont, string.Format("Start Number:   {0}", GameplayOptions.StartNumber), new Vector2(x, y + 150), row == 4 ? Color.Blue : Color.Black);
+            spriteBatch.DrawString(_gameFont, string.Format("Start Number:   {0}", 
+                GameplayOptions.StartNumber < 0 ? "Random" : GameplayOptions.StartNumber.ToString()), 
+                new Vector2(x, y + 150), row == 4 ? Color.Blue : Color.Black);
             spriteBatch.DrawString(_gameFont, string.Format("Background:   {0}", GameplayOptions.BackgroundImage.Replace("_", " ")), new Vector2(x, y + 200), row == 5 ? Color.Blue : Color.Black);
 
             // stop drawing
@@ -225,9 +227,11 @@ namespace EquationFinder.Screens
                     //go to the next number below
                     GameplayOptions.StartNumber--;
 
-                    //if the number is below 1, go back to the max number
-                    if (GameplayOptions.StartNumber < 11)
+                    if (GameplayOptions.StartNumber < -1)
                         GameplayOptions.StartNumber = 50;
+
+                    else if (GameplayOptions.StartNumber < 11)
+                        GameplayOptions.StartNumber = -1;
 
                 }
                 else if (row == 5)
@@ -237,17 +241,37 @@ namespace EquationFinder.Screens
                     {
                         GameplayOptions.BackgroundImage = "Wood";
                     }
-                    else if (GameplayOptions.BackgroundImage == "Fibers")
+                    else if (GameplayOptions.BackgroundImage == "Cornflower_Blue")
                     {
                         GameplayOptions.BackgroundImage = "Color";
                     }
-                    else if (GameplayOptions.BackgroundImage == "Map")
+                    else if (GameplayOptions.BackgroundImage == "Fibers")
+                    {
+                        GameplayOptions.BackgroundImage = "Cornflower_Blue";
+                    }
+                    else if (GameplayOptions.BackgroundImage == "Ghost_White")
                     {
                         GameplayOptions.BackgroundImage = "Fibers";
                     }
-                    else if (GameplayOptions.BackgroundImage == "Round_Dreams")
+                    else if (GameplayOptions.BackgroundImage == "Hulk_Green")
+                    {
+                        GameplayOptions.BackgroundImage = "Ghost_White";
+                    }
+                    else if (GameplayOptions.BackgroundImage == "Joker_Purple")
+                    {
+                        GameplayOptions.BackgroundImage = "Hulk_Green";
+                    }
+                    else if (GameplayOptions.BackgroundImage == "Map")
+                    {
+                        GameplayOptions.BackgroundImage = "Joker_Purple";
+                    }
+                    else if (GameplayOptions.BackgroundImage == "Midnight_Black")
                     {
                         GameplayOptions.BackgroundImage = "Map";
+                    }
+                    else if (GameplayOptions.BackgroundImage == "Round_Dreams")
+                    {
+                        GameplayOptions.BackgroundImage = "Midnight_Black";
                     }
                     else if (GameplayOptions.BackgroundImage == "Smoke")
                     {
@@ -318,6 +342,8 @@ namespace EquationFinder.Screens
 
                     //if the number is above 50, go to 1
                     if (GameplayOptions.StartNumber > 50)
+                        GameplayOptions.StartNumber = -1;
+                    else if (GameplayOptions.StartNumber < 11)
                         GameplayOptions.StartNumber = 11;
 
                 }
@@ -326,13 +352,33 @@ namespace EquationFinder.Screens
 
                     if (GameplayOptions.BackgroundImage == "Color")
                     {
+                        GameplayOptions.BackgroundImage = "Cornflower_Blue";
+                    }
+                    else if (GameplayOptions.BackgroundImage == "Cornflower_Blue")
+                    {
                         GameplayOptions.BackgroundImage = "Fibers";
                     }
                     else if (GameplayOptions.BackgroundImage == "Fibers")
                     {
+                        GameplayOptions.BackgroundImage = "Ghost_White";
+                    }
+                    else if (GameplayOptions.BackgroundImage == "Ghost_White")
+                    {
+                        GameplayOptions.BackgroundImage = "Hulk_Green";
+                    }
+                    else if (GameplayOptions.BackgroundImage == "Hulk_Green")
+                    {
+                        GameplayOptions.BackgroundImage = "Joker_Purple";
+                    }
+                    else if (GameplayOptions.BackgroundImage == "Joker_Purple")
+                    {
                         GameplayOptions.BackgroundImage = "Map";
                     }
                     else if (GameplayOptions.BackgroundImage == "Map")
+                    {
+                        GameplayOptions.BackgroundImage = "Midnight_Black";
+                    }
+                    else if (GameplayOptions.BackgroundImage == "Midnight_Black")
                     {
                         GameplayOptions.BackgroundImage = "Round_Dreams";
                     }
