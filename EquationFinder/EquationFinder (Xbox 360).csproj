@@ -75,6 +75,7 @@
     <Compile Include="EquationFinderGame.cs" />
     <Compile Include="Helpers\ClockTimer.cs" />
     <Compile Include="Helpers\ColorPaletteHelper.cs" />
+    <Compile Include="Helpers\GameTypeEnum.cs" />
     <Compile Include="Helpers\InputHelpers.cs" />
     <Compile Include="Helpers\StorageHelper.cs" />
     <Compile Include="Input\Direction.cs" />

@@ -41,6 +41,7 @@ namespace EquationFinder.Screens
         ContentManager _content;
 
         //board variables
+        GameTypeEnum _gameTypeEnum;
         int _boardSize;
         int _currentX, _currentY;
         int _selectedX, _selectedY;
@@ -108,6 +109,7 @@ namespace EquationFinder.Screens
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
 
             //set the global variables
+            this._gameTypeEnum = GameplayOptions.GameType;
             this._boardSize = GameplayOptions.BoardSize;
             this._currentX = 0;
             this._currentY = 0;
@@ -256,6 +258,10 @@ namespace EquationFinder.Screens
             if (_clock.displayClock == "Game Over")
                 time = "Game Over";
 
+            //if we are doing free play, set the time
+            if (_gameTypeEnum == GameTypeEnum.FREE_PLAY)
+                time = "Time: Free Play";
+
             //draw the space need for the time string
             Vector2 stringSize = _gameFont.MeasureString(time);
             spriteBatch.DrawString(_gameFont, time, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width - stringSize.Length() - 40,
@@ -263,7 +269,7 @@ namespace EquationFinder.Screens
 
             //if they are in trail mode, show N/A
             var remaining = "Next Level: ";
-            if (EquationFinderGame.IsTrailMode)
+            if (EquationFinderGame.IsTrailMode || _gameTypeEnum == GameTypeEnum.FREE_PLAY)
                 remaining += "N/A";
             else if (Math.Max(this._roundTarget - this._roundCorrect, 0) > 0)
                 remaining += string.Format("{0:n0}", Math.Max(this._roundTarget - this._roundCorrect, 0));
@@ -366,7 +372,10 @@ namespace EquationFinder.Screens
                     _clock.CheckTime(gameTime);
 
                     //check to see if we qualified for the next round
-                    if (_clock.displayClock == "Game Over" && this._roundCorrect >= this._roundTarget && EquationFinderGame.IsTrailMode == false)
+                    if (_clock.displayClock == "Game Over" 
+                        && this._roundCorrect >= this._roundTarget 
+                        && EquationFinderGame.IsTrailMode == false
+                        && _gameTypeEnum == GameTypeEnum.TIMED)
                     {
 
                         //go to the next round
@@ -404,7 +413,8 @@ namespace EquationFinder.Screens
                 }   
 
                 //if we want to save the high score file
-                if (_clock.isFinished == true)
+                if (_clock.isFinished == true
+                    && _gameTypeEnum == GameTypeEnum.TIMED)
                 {
 
                     // the game is over, show the high score screen
@@ -443,7 +453,7 @@ namespace EquationFinder.Screens
             var direction = Direction.FromInput(GamePadState, KeyboardState);
             if (Direction.FromInput(lastGamePadState, lastKeyboardState) != direction
                 && direction != 0.0
-                && timeSinceLast > TimeSpan.FromMilliseconds(125))
+                && timeSinceLast >= TimeSpan.FromMilliseconds(140))
             {
                 LastDirectionalInputTime = time;
                 this.HandleDirection(direction);

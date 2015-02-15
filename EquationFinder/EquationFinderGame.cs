@@ -82,6 +82,7 @@ namespace EquationFinder
             GameplayOptions.PlayMusic = "Battle";
             GameplayOptions.StartNumber = -1;
             GameplayOptions.BackgroundImage = "Midnight_Black";
+            GameplayOptions.GameType = GameTypeEnum.TIMED;
             
             //load the loading screen
             LoadingScreen.Load(screenManager, true, null, null);
@@ -156,6 +157,8 @@ namespace EquationFinder
                                     GameplayOptions.StartNumber = Convert.ToInt32(sr.ReadLine());
                                 else if (row == 5)
                                     GameplayOptions.BackgroundImage = sr.ReadLine();
+                                else if (row == 6)
+                                    GameplayOptions.GameType = (GameTypeEnum)Enum.Parse(typeof(GameTypeEnum), sr.ReadLine(), true);
 
                                 //go to the next row
                                 row++;

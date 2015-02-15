@@ -77,12 +77,13 @@ namespace EquationFinder.Screens
 
             //draw the strings
             spriteBatch.DrawString(_gameFont, string.Format("Board Size:   {0}", GameplayOptions.BoardSize), new Vector2(x, y), row == 1 ? Color.Blue : Color.Black);
-            spriteBatch.DrawString(_gameFont, string.Format("Play Sound Effects:   {0}", GameplayOptions.PlaySoundEffects ? "Yes" : "No"), new Vector2(x, y + 50), row == 2 ? Color.Blue : Color.Black);
-            spriteBatch.DrawString(_gameFont, string.Format("Play Music:   {0}", GameplayOptions.PlayMusic), new Vector2(x, y + 100), row == 3 ? Color.Blue : Color.Black);
+            spriteBatch.DrawString(_gameFont, string.Format("Game Type:   {0}", GameplayOptions.GameType == GameTypeEnum.TIMED ? "Timed" : "Free Play"), new Vector2(x, y + 50), row == 2 ? Color.Blue : Color.Black);
+            spriteBatch.DrawString(_gameFont, string.Format("Play Sound Effects:   {0}", GameplayOptions.PlaySoundEffects ? "Yes" : "No"), new Vector2(x, y + 100), row == 3 ? Color.Blue : Color.Black);
+            spriteBatch.DrawString(_gameFont, string.Format("Play Music:   {0}", GameplayOptions.PlayMusic), new Vector2(x, y + 150), row == 4 ? Color.Blue : Color.Black);
             spriteBatch.DrawString(_gameFont, string.Format("Start Number:   {0}", 
                 GameplayOptions.StartNumber < 0 ? "Random" : GameplayOptions.StartNumber.ToString()), 
-                new Vector2(x, y + 150), row == 4 ? Color.Blue : Color.Black);
-            spriteBatch.DrawString(_gameFont, string.Format("Background:   {0}", GameplayOptions.BackgroundImage.Replace("_", " ")), new Vector2(x, y + 200), row == 5 ? Color.Blue : Color.Black);
+                new Vector2(x, y + 200), row == 5 ? Color.Blue : Color.Black);
+            spriteBatch.DrawString(_gameFont, string.Format("Background:   {0}", GameplayOptions.BackgroundImage.Replace("_", " ")), new Vector2(x, y + 250), row == 6 ? Color.Blue : Color.Black);
 
             // stop drawing
             spriteBatch.End();
@@ -143,15 +144,17 @@ namespace EquationFinder.Screens
             {
 
                 if (row == 1)
-                    row = 5;
+                    row = 6;
                 else if (row == 2)
                     row = 1;
                 else if (row == 3)
                     row = 2;
                 else if (row == 4)
                     row = 3;
-                else
+                else if (row == 5)
                     row = 4;
+                else
+                    row = 5;
 
 
             }
@@ -166,6 +169,8 @@ namespace EquationFinder.Screens
                     row = 4;
                 else if (row == 4)
                     row = 5;
+                else if (row == 5)
+                    row = 6;
                 else
                     row = 1;
 
@@ -190,13 +195,22 @@ namespace EquationFinder.Screens
                 else if (row == 2)
                 {
 
+                    if (GameplayOptions.GameType == GameTypeEnum.TIMED)
+                        GameplayOptions.GameType = GameTypeEnum.FREE_PLAY;
+                    else
+                        GameplayOptions.GameType = GameTypeEnum.TIMED;
+
+                }
+                else if (row == 3)
+                {
+
                     if (GameplayOptions.PlaySoundEffects)
                         GameplayOptions.PlaySoundEffects = false;
                     else
                         GameplayOptions.PlaySoundEffects = true;
 
                 }
-                else if (row == 3)
+                else if (row == 4)
                 {
 
                     if (GameplayOptions.PlayMusic == "Off")
@@ -221,7 +235,7 @@ namespace EquationFinder.Screens
                     }
 
                 }
-                else if (row == 4)
+                else if (row == 5)
                 {
 
                     //go to the next number below
@@ -234,7 +248,7 @@ namespace EquationFinder.Screens
                         GameplayOptions.StartNumber = -1;
 
                 }
-                else if (row == 5)
+                else if (row == 6)
                 {
 
                     if (GameplayOptions.BackgroundImage == "Color")
@@ -304,13 +318,22 @@ namespace EquationFinder.Screens
                 else if (row == 2)
                 {
 
+                    if (GameplayOptions.GameType == GameTypeEnum.TIMED)
+                        GameplayOptions.GameType = GameTypeEnum.FREE_PLAY;
+                    else
+                        GameplayOptions.GameType = GameTypeEnum.TIMED;
+
+                }
+                else if (row == 3)
+                {
+
                     if (GameplayOptions.PlaySoundEffects)
                         GameplayOptions.PlaySoundEffects = false;
                     else
                         GameplayOptions.PlaySoundEffects = true;
 
                 }
-                else if (row == 3)
+                else if (row == 4)
                 {
 
                     if (GameplayOptions.PlayMusic == "Off")
@@ -335,7 +358,7 @@ namespace EquationFinder.Screens
                     }
 
                 }
-                else if (row == 4)
+                else if (row == 5)
                 {
 
                     GameplayOptions.StartNumber++;
@@ -347,7 +370,7 @@ namespace EquationFinder.Screens
                         GameplayOptions.StartNumber = 11;
 
                 }
-                else if (row == 5)
+                else if (row == 6)
                 {
 
                     if (GameplayOptions.BackgroundImage == "Color")

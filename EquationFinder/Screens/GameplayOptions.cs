@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using EquationFinder.Helpers;
 
 namespace EquationFinder.Screens
 {
@@ -12,5 +13,6 @@ namespace EquationFinder.Screens
         public static string PlayMusic;
         public static int StartNumber;
         public static string BackgroundImage;
+        public static GameTypeEnum GameType;
     }
 }
