@@ -236,12 +236,12 @@ namespace EquationFinder.Screens
         {
 
             //calculate my x and y
-            var x = (ScreenManager.GraphicsDevice.Viewport.Width / 2);
-            var y = (ScreenManager.GraphicsDevice.Viewport.Height / 2) - 50;
+            var x = ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X;
+            var y = ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y + (ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Height / 2) - 50;
 
             //draw the strings
-            spriteBatch.DrawString(_gameFont, "Resume Game", new Vector2(x - Convert.ToInt32(_gameFont.MeasureString("Resume Game").Length()), y), _pasuedMenuCount == 1 ? _colorPalatte.PausedMenuTextSelected : _colorPalatte.PausedMenuTextUnselected);
-            spriteBatch.DrawString(_gameFont, "Exit to menu", new Vector2(x - Convert.ToInt32(_gameFont.MeasureString("Exit to menu").Length()), y + 50), _pasuedMenuCount == 2 ? _colorPalatte.PausedMenuTextSelected : _colorPalatte.PausedMenuTextUnselected);
+            spriteBatch.DrawString(_gameFont, "Resume Game", new Vector2(x, y), _pasuedMenuCount == 1 ? _colorPalatte.PausedMenuTextSelected : _colorPalatte.PausedMenuTextUnselected);
+            spriteBatch.DrawString(_gameFont, "Exit to menu", new Vector2(x, y + 50), _pasuedMenuCount == 2 ? _colorPalatte.PausedMenuTextSelected : _colorPalatte.PausedMenuTextUnselected);
 
         }
 
@@ -249,9 +249,9 @@ namespace EquationFinder.Screens
         {
 
             // Draw the score
-            spriteBatch.DrawString(_gameFont, "Target: " + _target, new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 40, ScreenManager.GraphicsDevice.Viewport.Y + 10), this._colorPalatte.DisplayText);
-            spriteBatch.DrawString(_gameFont, "Score: " + string.Format("{0:n0}", this._score), new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 40, ScreenManager.GraphicsDevice.Viewport.Y + 40), this._colorPalatte.DisplayText);
-            spriteBatch.DrawString(_gameFont, "Equation: " + _currentEquation, new Vector2(ScreenManager.GraphicsDevice.Viewport.X + 40, ScreenManager.GraphicsDevice.Viewport.Y + 70), this._colorPalatte.DisplayText);
+            spriteBatch.DrawString(_gameFont, "Target: " + _target, new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y), this._colorPalatte.DisplayText);
+            spriteBatch.DrawString(_gameFont, "Score: " + string.Format("{0:n0}", this._score), new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y + 30), this._colorPalatte.DisplayText);
+            spriteBatch.DrawString(_gameFont, "Equation: " + _currentEquation, new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X, ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y + 60), this._colorPalatte.DisplayText);
 
             //get the time string
             var time = "Time:   " + _clock.displayClock;
@@ -264,8 +264,8 @@ namespace EquationFinder.Screens
 
             //draw the space need for the time string
             Vector2 stringSize = _gameFont.MeasureString(time);
-            spriteBatch.DrawString(_gameFont, time, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width - stringSize.Length() - 40,
-                ScreenManager.GraphicsDevice.Viewport.Y + 10), this._colorPalatte.DisplayText);
+            spriteBatch.DrawString(_gameFont, time, new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Width - stringSize.Length(),
+                ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y), this._colorPalatte.DisplayText);
 
             //if they are in trail mode, show N/A
             var remaining = "Next Level: ";
@@ -277,7 +277,7 @@ namespace EquationFinder.Screens
                 remaining += "unlocked";
 
             stringSize = _gameFont.MeasureString(remaining);
-            spriteBatch.DrawString(_gameFont, remaining, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width - stringSize.Length() - 40, ScreenManager.GraphicsDevice.Viewport.Y + 40), this._colorPalatte.DisplayText);
+            spriteBatch.DrawString(_gameFont, remaining, new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Width - stringSize.Length(), ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y + 30), this._colorPalatte.DisplayText);
 
             int row = 0, col = 0;
             while (row < this._boardSize)
@@ -317,7 +317,7 @@ namespace EquationFinder.Screens
                 spriteBatch.DrawString(
                     _gameFont,
                     _flashText.Text,
-                    new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, ScreenManager.GraphicsDevice.Viewport.Height - 50f) - (textSize / 2),
+                    new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + (ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Width / 2) - (textSize.Length() / 2), ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y + 30),
                     (_flashText.IsErrorText) ? this._colorPalatte.FlashTextIncorrect : this._colorPalatte.FlashTextCorrect);
 
             }
@@ -453,7 +453,7 @@ namespace EquationFinder.Screens
             var direction = Direction.FromInput(GamePadState, KeyboardState);
             if (Direction.FromInput(lastGamePadState, lastKeyboardState) != direction
                 && direction != 0.0
-                && timeSinceLast >= TimeSpan.FromMilliseconds(140))
+                && timeSinceLast >= TimeSpan.FromMilliseconds(165))
             {
                 LastDirectionalInputTime = time;
                 this.HandleDirection(direction);
@@ -742,15 +742,16 @@ namespace EquationFinder.Screens
         {
 
             //we need to calculate the start point for the x and y axis
-            int width, height, x, y;
-            width = _boardSize * 48;
-            height = _boardSize * 33;
+            int width, x, y;
+            width = (_boardSize * 60) - 30;
 
             //get our starting X,Y position
-            x = (ScreenManager.GraphicsDevice.Viewport.Width / 2) - (width / 2);
-            y = (int)((decimal)ScreenManager.GraphicsDevice.Viewport.Height * 0.56m) - (height / 2);
+            x = (ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + (ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Width / 2) - (width / 2));
+            //y = (int)((decimal)ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Height * 0.56m) - (height / 2);
+            //x = ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X;
+            y = ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y + 120;
 
-            // start at 175, 175
+            //set the starting position
             Vector2 position = new Vector2(x, y);
 
             int row = 0, col = 0;

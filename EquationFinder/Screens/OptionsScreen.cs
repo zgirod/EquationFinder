@@ -72,8 +72,8 @@ namespace EquationFinder.Screens
                     ScreenManager.GraphicsDevice.Viewport.Height), Color.White);
 
             //calculate my x and y
-            var x = (ScreenManager.GraphicsDevice.Viewport.Width / 2) - 200;
-            var y = (ScreenManager.GraphicsDevice.Viewport.Height / 2) - 125;
+            var x = ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + (ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Width / 2) - 200;
+            var y = ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y + (ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Height / 2) - 125;
 
             //draw the strings
             spriteBatch.DrawString(_gameFont, string.Format("Board Size:   {0}", GameplayOptions.BoardSize), new Vector2(x, y), row == 1 ? Color.Blue : Color.Black);
