@@ -28,34 +28,40 @@ namespace EquationFinder.Input
         /// <summary>
         /// Gets the current direction from a game pad and keyboard.
         /// </summary>
-        public static Buttons FromInput(GamePadState gamePad, KeyboardState keyboard)
+        public static Buttons FromInput(GamePadState gamePad, 
+            KeyboardState keyboard,
+            GamePadState oldGamePad)
         {
+
+            //if we don't have an old game pad state, just return null
             Buttons direction = None;
+            if (oldGamePad == null)
+                return direction;
 
             // Get vertical direction.
-            if (gamePad.IsButtonDown(Buttons.DPadUp) ||
-                gamePad.IsButtonDown(Buttons.LeftThumbstickUp) ||
-                keyboard.IsKeyDown(Keys.Up))
+            if ((gamePad.DPad.Up == ButtonState.Pressed && oldGamePad.DPad.Up == ButtonState.Released)
+                || (gamePad.ThumbSticks.Left.Y >= .24f && oldGamePad.ThumbSticks.Left.Y <= .24f)
+                || keyboard.IsKeyDown(Keys.Up))
             {
                 direction |= Up;
             }
-            else if (gamePad.IsButtonDown(Buttons.DPadDown) ||
-                gamePad.IsButtonDown(Buttons.LeftThumbstickDown) ||
-                keyboard.IsKeyDown(Keys.Down))
+            else if ((gamePad.DPad.Down == ButtonState.Pressed && oldGamePad.DPad.Down == ButtonState.Released)
+                || (gamePad.ThumbSticks.Left.Y <= -0.24f && oldGamePad.ThumbSticks.Left.Y >= -0.24f)
+                || keyboard.IsKeyDown(Keys.Down))
             {
                 direction |= Down;
             }
 
             // Comebine with horizontal direction.
-            if (gamePad.IsButtonDown(Buttons.DPadLeft) ||
-                gamePad.IsButtonDown(Buttons.LeftThumbstickLeft) ||
-                keyboard.IsKeyDown(Keys.Left))
+            if ((gamePad.DPad.Left == ButtonState.Pressed && oldGamePad.DPad.Left == ButtonState.Released)
+                || (gamePad.ThumbSticks.Left.X <= -0.24f && oldGamePad.ThumbSticks.Left.X >= -0.24f)
+                || keyboard.IsKeyDown(Keys.Left))
             {
                 direction |= Left;
             }
-            else if (gamePad.IsButtonDown(Buttons.DPadRight) ||
-                gamePad.IsButtonDown(Buttons.LeftThumbstickRight) ||
-                keyboard.IsKeyDown(Keys.Right))
+            else if ((gamePad.DPad.Right == ButtonState.Pressed && oldGamePad.DPad.Right == ButtonState.Released)
+                || (gamePad.ThumbSticks.Left.X >= 0.24f && oldGamePad.ThumbSticks.Left.X <= 0.24f)
+                || keyboard.IsKeyDown(Keys.Right))
             {
                 direction |= Right;
             }

@@ -98,8 +98,8 @@ namespace EquationFinder.Screens
 
             //get the direction
             //get the direction
-            var direction = Direction.FromInput(GamePadState, KeyboardState);
-            if (Direction.FromInput(lastGamePadState, lastKeyboardState) != direction && direction != 0.0)
+            var direction = Direction.FromInput(GamePadState, KeyboardState, lastGamePadState);
+            if (Direction.FromInput(lastGamePadState, lastKeyboardState, lastGamePadState) != direction && direction != 0.0)
                 this.HandleDirection(direction);
 
             //call the base update

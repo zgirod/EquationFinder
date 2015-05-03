@@ -53,7 +53,7 @@ namespace EquationFinder.Screens
             KeyboardState = InputHelpers.GetKeyboardStateForAllPLayers();
 
             //get the direction
-            var direction = Direction.FromInput(GamePadState, KeyboardState);
+            var direction = Direction.FromInput(GamePadState, KeyboardState, lastGamePadState);
             if (direction != 0.0)
             {
 
@@ -198,10 +198,10 @@ namespace EquationFinder.Screens
             //add some text
             y = AddTextToList("Q: How do I go to the next number?", y, false, true);
             y = AddTextToList("By getting a certain number of correct equations.  The number of correct equations needed is the target number divided by 3.", y, true, true);
-            y = AddTextToList("Q: What do I get in the trail mode?", y, false, true);
+            y = AddTextToList("Q: What do I get in the trial mode?", y, false, true);
             y = AddTextToList("You get to play the full game however to don't get to go to the next number when your round ends.  In the full game you get to go to the next number if you get enough equations correct.", y, true, true);
 
-            y = AddTextToList("Q: How do I get enough correct to go to the next round?", y, false, true);
+            y = AddTextToList("Q: How do I get enough correct to go to the next number?", y, false, true);
             y = AddTextToList("The number to get correct is equal to the Floor(Target / 3).  So if the target is 17, you would need to get 5 correct because the floor of 17 divided by 3 is 5.", y, true, true);
 
             y = AddTextToList("Q: How are scores calculated?", y, false, true);

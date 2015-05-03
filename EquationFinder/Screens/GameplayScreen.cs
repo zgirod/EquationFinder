@@ -14,6 +14,7 @@ using Microsoft.Xna.Framework.Storage;
 using EquationFinder.Objects;
 using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Media;
+using System.Reflection;
 
 namespace EquationFinder.Screens
 {
@@ -33,6 +34,12 @@ namespace EquationFinder.Screens
         ALREADY_SELECTED,
         SUCCESS,
         TOO_LONG
+    }
+
+    public enum MoveTypeCheck
+    {
+        REAL,
+        HUD
     }
 
     public class GameplayScreen : GameScreen
@@ -72,19 +79,27 @@ namespace EquationFinder.Screens
 
         // The font used to display UI elements
         SpriteFont _gameFont;
+        SpriteFont _boardFont;
         ColorPalette _colorPalatte;
 
         //the sound effects
-        double _lastPlayedSound = 0;
         SoundEffect _correctSound;
         SoundEffect _incorrectSound;
         Song _backgroundMusic;
         Texture2D _backgroundImage;
 
+        //the display hud for moves
+        Dictionary<string, string> _hudMoves;
+        string _hudMovesDisplay;
+
         private int _moveCount = 0;
+        private Texture2D _emptyTexture;
+        private bool _drawPreviousLines;
 
         public GamePadState GamePadState { get; private set; }
         public KeyboardState KeyboardState { get; private set; }
+
+        private List<Color> _predefinedColors = new List<Color>();
 
         /// <summary>
         /// The last "real time" that new input was received. Slightly late button
@@ -122,6 +137,7 @@ namespace EquationFinder.Screens
             this._gameBoard = new BoardItem[GameplayOptions.BoardSize, GameplayOptions.BoardSize];
             this._gameBoardValues = BoardLogic.CreateBoard(GameplayOptions.BoardSize, GameplayOptions.StartNumber);
 
+            this._drawPreviousLines = false;
             this._currentEquation = "";
             this._selectedYXs.Clear();
             this._previouslySelectedYXs.Clear();
@@ -137,6 +153,51 @@ namespace EquationFinder.Screens
             if (_roundTarget < 1)
                 _roundTarget = 1;
 
+            //setup the HUD for the moves
+            this._hudMoves = new Dictionary<string, string>();
+
+            //get a list of all the colors we want to use to draw lines
+            _predefinedColors.Add(new Color(82, 0, 229));
+            _predefinedColors.Add(new Color(0, 229, 15));
+            _predefinedColors.Add(new Color(229, 0, 51));
+            _predefinedColors.Add(new Color(0, 118, 229));
+            _predefinedColors.Add(new Color(185, 229, 0));
+            _predefinedColors.Add(new Color(206, 0, 229));
+            _predefinedColors.Add(new Color(0, 229, 139));
+            _predefinedColors.Add(new Color(229, 72, 0));
+            _predefinedColors.Add(new Color(5, 0, 229));
+            _predefinedColors.Add(new Color(61, 229, 0));
+            _predefinedColors.Add(new Color(229, 0, 128));
+            _predefinedColors.Add(new Color(0, 195, 229));
+            _predefinedColors.Add(new Color(229, 196, 0));
+            _predefinedColors.Add(new Color(129, 0, 229));
+            _predefinedColors.Add(new Color(0, 229, 62));
+            _predefinedColors.Add(new Color(229, 0, 4));
+            _predefinedColors.Add(new Color(0, 71, 229));
+            _predefinedColors.Add(new Color(138, 229, 0));
+            _predefinedColors.Add(new Color(229, 0, 205));
+            _predefinedColors.Add(new Color(0, 229, 186));
+            _predefinedColors.Add(new Color(229, 119, 0));
+            _predefinedColors.Add(new Color(52, 0, 229));
+            _predefinedColors.Add(new Color(14, 229, 0));
+            _predefinedColors.Add(new Color(229, 0, 81));
+            _predefinedColors.Add(new Color(0, 148, 229));
+            _predefinedColors.Add(new Color(215, 229, 0));
+            _predefinedColors.Add(new Color(177, 0, 229));
+            _predefinedColors.Add(new Color(0, 229, 110));
+            _predefinedColors.Add(new Color(229, 43, 0));
+            _predefinedColors.Add(new Color(0, 23, 229));
+            _predefinedColors.Add(new Color(90, 229, 0));
+            _predefinedColors.Add(new Color(229, 0, 157));
+            _predefinedColors.Add(new Color(0, 224, 229));
+            _predefinedColors.Add(new Color(229, 167, 0));
+            _predefinedColors.Add(new Color(100, 0, 229));
+            _predefinedColors.Add(new Color(0, 229, 33));
+            _predefinedColors.Add(new Color(229, 0, 33));
+            _predefinedColors.Add(new Color(0, 100, 229));
+            _predefinedColors.Add(new Color(167, 229, 0));
+            _predefinedColors.Add(new Color(224, 0, 229));
+
         }
 
         /// <summary>
@@ -150,8 +211,9 @@ namespace EquationFinder.Screens
             // Load the background texture we will be using
             _backgroundImage = _content.Load<Texture2D>("img/bg/" + GameplayOptions.BackgroundImage);
 
-            // Load the score font
+            //Load the fonts
             _gameFont = _content.Load<SpriteFont>("gameFont");
+            _boardFont = _content.Load<SpriteFont>("boardFont");
 
             // Load the laser and explosion sound effect
             _correctSound = _content.Load<SoundEffect>("sound/correct");
@@ -269,7 +331,7 @@ namespace EquationFinder.Screens
 
             //if they are in trail mode, show N/A
             var remaining = "Next Level: ";
-            if (EquationFinderGame.IsTrailMode || _gameTypeEnum == GameTypeEnum.FREE_PLAY)
+            if (Guide.IsTrialMode || _gameTypeEnum == GameTypeEnum.FREE_PLAY)
                 remaining += "N/A";
             else if (Math.Max(this._roundTarget - this._roundCorrect, 0) > 0)
                 remaining += string.Format("{0:n0}", Math.Max(this._roundTarget - this._roundCorrect, 0));
@@ -293,7 +355,12 @@ namespace EquationFinder.Screens
                         .FirstOrDefault(x => x == string.Format("{0},{1}", row, col)) != null;
 
                     //show the item
-                    this._gameBoard[row, col].Draw(this, isSelected, isPreviouslySelected, gameTime, this._colorPalatte);
+                    this._gameBoard[row, col].Draw(this, 
+                        isSelected, 
+                        isPreviouslySelected, 
+                        gameTime, 
+                        this._colorPalatte,
+                        _boardFont);
 
                     //go to the next column
                     col++;
@@ -305,6 +372,14 @@ namespace EquationFinder.Screens
                 col = 0;
 
             }
+
+            //draw the hud at the bottom
+            stringSize = _gameFont.MeasureString(this.HudMovesDisplay);
+            spriteBatch.DrawString(
+                    _gameFont,
+                    this.HudMovesDisplay,
+                    new Vector2(ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.X + (ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Width / 2) - (stringSize.Length() / 2), ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Y + ScreenManager.GraphicsDevice.Viewport.TitleSafeArea.Height - 30),
+                    this._colorPalatte.DisplayText);
 
             //if we have flash text, draw the string
             if (_flashText.Active)
@@ -322,6 +397,64 @@ namespace EquationFinder.Screens
 
             }
 
+            //if we want to draw the lines
+            if (_drawPreviousLines)
+                DrawLines(spriteBatch);
+
+        }
+
+        private void DrawLines(SpriteBatch spriteBatch)
+        {
+
+            var colorLoop = 0;
+            foreach (var previousSelectedYX in _previouslySelectedYXs.OrderByDescending(x => x.Count()))
+            {
+
+                var count = previousSelectedYX.Count();
+                if (count > 1) 
+                {
+                    var i = 0;
+                    while (i <= count - 2) 
+                    {
+
+                        var crumbs = previousSelectedYX[i].Split(new char[] { ',' });
+                        var point1 = this._gameBoard[Convert.ToInt32(crumbs[0]), Convert.ToInt32(crumbs[1])].GetCenter(this);
+
+                        crumbs = previousSelectedYX[i + 1].Split(new char[] { ',' });
+                        var point2 = this._gameBoard[Convert.ToInt32(crumbs[0]), Convert.ToInt32(crumbs[1])].GetCenter(this);
+
+                        this.DrawLine(spriteBatch, _predefinedColors[colorLoop % _predefinedColors.Count()], point1, point2, 3f, 0.0f);
+
+                        //go to the next point
+                        i++;
+                    }
+                }
+
+                colorLoop++;
+
+            }
+
+        }
+
+        /// <summary>
+        /// Draw a line into a SpriteBatch
+        /// https://gist.github.com/pctroll/2731936
+        /// </summary>
+        /// <param name="batch">SpriteBatch to draw line</param>
+        /// <param name="color">The line color</param>
+        /// <param name="point1">Start Point</param>
+        /// <param name="point2">End Point</param>
+        /// <param name="Layer">Layer or Z position</param>
+        public void DrawLine(SpriteBatch batch, Color color, Vector2 point1,
+                                    Vector2 point2, float thinkness, float Layer)
+        {
+
+            float angle = (float)Math.Atan2(point2.Y - point1.Y, point2.X - point1.X);
+            float length = (point2 - point1).Length();
+
+            batch.Draw(_emptyTexture, point1, null, color,
+                       angle, Vector2.Zero, new Vector2(length, thinkness),
+                       SpriteEffects.None, Layer);
         }
 
         public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
@@ -341,15 +474,22 @@ namespace EquationFinder.Screens
                     //update the board items
                     UpdateBoardItems();
 
+                    //run the hud update
+                    this.PopulateHudMoves(gameTime);
+
+                    //setup the empty texture for drawing lines
+                    _emptyTexture = new Texture2D(ScreenManager.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
+                    _emptyTexture.SetData(new[] { Color.White });
+
                     //set the init flag
                     this._isBoardInitialized = true;
 
                 }
 
-                //count 60 seconds down 
+                //count 90 seconds down 
                 _clock.Start(_secondsPerRound);
             }
-            else if (_clock.isFinished == false && _isPaused == false)
+            else if ((_clock.isFinished == false || _gameTypeEnum == GameTypeEnum.FREE_PLAY) && _isPaused == false)
             {
 
                 int row = 0, col = 0;
@@ -373,8 +513,8 @@ namespace EquationFinder.Screens
 
                     //check to see if we qualified for the next round
                     if (_clock.displayClock == "Game Over" 
-                        && this._roundCorrect >= this._roundTarget 
-                        && EquationFinderGame.IsTrailMode == false
+                        && this._roundCorrect >= this._roundTarget
+                        && Guide.IsTrialMode == false
                         && _gameTypeEnum == GameTypeEnum.TIMED)
                     {
 
@@ -397,7 +537,7 @@ namespace EquationFinder.Screens
                         _flashText.RunClock = true;
                         
                         //reset the board for the next level
-                        this.ResetBoardForNextLevel();
+                        this.ResetBoardForNextLevel(gameTime);
 
                     }
 
@@ -450,13 +590,13 @@ namespace EquationFinder.Screens
             TimeSpan timeSinceLast = time - LastDirectionalInputTime;
 
             //get the direction
-            var direction = Direction.FromInput(GamePadState, KeyboardState);
-            if (Direction.FromInput(lastGamePadState, lastKeyboardState) != direction
+            var direction = Direction.FromInput(GamePadState, KeyboardState, lastGamePadState);
+            if (Direction.FromInput(lastGamePadState, lastKeyboardState, lastGamePadState) != direction
                 && direction != 0.0
                 && timeSinceLast >= TimeSpan.FromMilliseconds(165))
             {
                 LastDirectionalInputTime = time;
-                this.HandleDirection(direction);
+                this.HandleDirection(direction, gameTime);
             }
                 
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
@@ -469,14 +609,17 @@ namespace EquationFinder.Screens
             _moveCount++;
 
             //don't do anything if the clock isn't running
-            if (_clock.isRunning == false || _clock.isFinished == true)
+            if ((_clock.isRunning == false || _clock.isFinished == true) && _gameTypeEnum != GameTypeEnum.FREE_PLAY)
                 return;
 
             //determine which input mode we should be in
             if (_isPaused)
                 this.HandlePausedMove(gameTime, move);
             else
-                this.HandleGameplayMove(gameTime, move);
+            {
+                this.HandleGameplayMove(gameTime, move, MoveTypeCheck.REAL);
+                this.PopulateHudMoves(gameTime);
+            }
 
             base.HandleMove(gameTime, move);
 
@@ -492,6 +635,9 @@ namespace EquationFinder.Screens
             // we have to catch the exception. Music will play when the game is not tethered
             try
             {
+
+                MediaPlayer.Volume = 0.7f;
+
                 // Play the music
                 MediaPlayer.Play(song);
 
@@ -502,13 +648,16 @@ namespace EquationFinder.Screens
             catch { }
         }
 
-        private void HandleDirection(Buttons direction)
+        private void HandleDirection(Buttons direction, GameTime gameTime)
         {
 
             if (_isPaused)
                 this.HandlePausedDirection(direction);
             else
+            {
                 this.HandleGameplayDirection(direction);
+                this.PopulateHudMoves(gameTime);
+            }
 
         }
 
@@ -574,25 +723,28 @@ namespace EquationFinder.Screens
 
         }
 
-        private void PlaySound(SoundEffect soundEffect, GameTime gameTime)
+        private void PlaySound(SoundEffect soundEffect, GameTime gameTime, MoveTypeCheck moveTypeCheck)
         {
 
             //if we want to play sound effects
-            if (GameplayOptions.PlaySoundEffects)
+            if (GameplayOptions.PlaySoundEffects && moveTypeCheck == MoveTypeCheck.REAL)
             {
 
-                //we don't want to play sounds to close together
-                if (gameTime.TotalGameTime.TotalMilliseconds - _lastPlayedSound >= 500)
-                {
-                    soundEffect.Play();
-                    _lastPlayedSound = gameTime.TotalGameTime.TotalMilliseconds;
-                }
+                float volume = 0.7f;
+                float soundStackingLevel = 1;
+ 
+                //Each time you play a sound 
+                soundEffect.Play(volume * soundStackingLevel, 0, 0); 
+                soundStackingLevel *= 0.5f; 
+             
+                //Each update 
+                soundStackingLevel = Math.Min(soundStackingLevel + 0.1f, 1f); 
 
             }
 
         }
 
-        private void AddOperation(GameTime gameTime, Move move)
+        private string AddOperation(GameTime gameTime, Move move, MoveTypeCheck moveTypeCheck)
         {
 
             //if we are on the letter A
@@ -607,7 +759,7 @@ namespace EquationFinder.Screens
                 {
 
                     //select the current number
-                    this.SelectNumber(gameTime);
+                    return this.SelectNumber(gameTime, moveTypeCheck);
 
                 }
 
@@ -618,7 +770,7 @@ namespace EquationFinder.Screens
                 {
 
                     //cycle through the operators
-                    this.CycleThroughOperators(gameTime);
+                    return this.CycleThroughOperators(gameTime, moveTypeCheck);
 
                 }
                 else if (_selectedActionTypes.Count > 0 
@@ -628,7 +780,10 @@ namespace EquationFinder.Screens
                     && _currentY == _selectedY)
                 {
 
-                    this.SelectNewOperator();
+                    if (moveTypeCheck == MoveTypeCheck.REAL)
+                        this.SelectNewOperator();
+                    else if (moveTypeCheck == MoveTypeCheck.HUD)
+                        return "+";
 
                 }
 
@@ -639,9 +794,11 @@ namespace EquationFinder.Screens
             {
 
                 //evaluate the equation
-                this.EvaulateEquation(gameTime);
+                this.EvaulateEquation(gameTime, MoveTypeCheck.REAL);
 
             }
+
+            return null;
 
         }
 
@@ -658,7 +815,7 @@ namespace EquationFinder.Screens
 
         }
 
-        private void CycleThroughOperators(GameTime gameTime)
+        private string CycleThroughOperators(GameTime gameTime, MoveTypeCheck moveTypeCheck)
         {
 
             //get the current operator
@@ -679,62 +836,101 @@ namespace EquationFinder.Screens
                 newOperator = "+";
             }
 
-            //set the new equation
-            _currentEquation = _currentEquation.Substring(0, _currentEquation.Length - 1) + newOperator;
+            //if we have a real move
+            if (moveTypeCheck == MoveTypeCheck.REAL)
+            {
 
-            //play success sound
-            this.PlaySound(_correctSound, gameTime);
+                //set the new equation
+                _currentEquation = _currentEquation.Substring(0, _currentEquation.Length - 1) + newOperator;
+
+                //play success sound
+                this.PlaySound(_correctSound, gameTime, moveTypeCheck);
+
+            }
+            else if (moveTypeCheck == MoveTypeCheck.HUD)
+            {
+
+                return newOperator;
+
+            }
+
+            return null;
 
         }
 
-        private void SelectNumber(GameTime gameTime)
+        private string SelectNumber(GameTime gameTime, MoveTypeCheck moveTypeCheck)
         {
 
-            var result = this.IsValidNumberMove(gameTime);
+            var result = this.IsValidNumberMove(gameTime, moveTypeCheck);
 
             //if we have a valid move
             if (result == SelectActionResult.SUCCESS
                 || result == SelectActionResult.OPERATOR_FIRST)
             {
 
-                //if the user forgot to set an operator, assume they meant to put a '+' and then select the letter
-                if (result == SelectActionResult.OPERATOR_FIRST)
-                    this.SelectNewOperator();
+                //if we have a real move
+                if (moveTypeCheck == MoveTypeCheck.REAL)
+                {
 
-                //add the current equation to the list
-                _undoEquations.Add(_currentEquation);
-                _undoType.Add("Number");
-                _selectedActionTypes.Add(ActionType.NUMBER);
+                    //if the user forgot to set an operator, assume they meant to put a '+' and then select the letter
+                    if (result == SelectActionResult.OPERATOR_FIRST)
+                        this.SelectNewOperator();
 
-                //get the current value
-                var currentValue = this._gameBoardValues[_currentY, _currentX].ToString();
+                    //add the current equation to the list
+                    _undoEquations.Add(_currentEquation);
+                    _undoType.Add("Number");
+                    _selectedActionTypes.Add(ActionType.NUMBER);
 
-                //add the currentValue to our equation
-                if (String.IsNullOrEmpty(_currentEquation))
-                    this._currentEquation = currentValue;
-                else
-                    this._currentEquation += string.Format(" {0}", currentValue);
+                    //get the current value
+                    var currentValue = this._gameBoardValues[_currentY, _currentX].ToString();
 
-                //update the selected values
-                _selectedX = _currentX;
-                _selectedY = _currentY;
+                    //add the currentValue to our equation
+                    if (String.IsNullOrEmpty(_currentEquation))
+                        this._currentEquation = currentValue;
+                    else
+                        this._currentEquation += string.Format(" {0}", currentValue);
 
-                //add the values to the previously selected list
-                _selectedYXs.Add(string.Format("{0},{1}", _currentY, _currentX));
+                    //update the selected values
+                    _selectedX = _currentX;
+                    _selectedY = _currentY;
+
+                    //add the values to the previously selected list
+                    _selectedYXs.Add(string.Format("{0},{1}", _currentY, _currentX));
+
+                }
+                else if (moveTypeCheck == MoveTypeCheck.HUD)
+                {
+
+                    //get the return string and return it
+                    var returnValue = String.Empty;
+                    if (result == SelectActionResult.OPERATOR_FIRST)
+                        returnValue = "+ ";
+                    return returnValue + this._gameBoardValues[_currentY, _currentX].ToString();
+
+                }
+
 
             }
             else
             {
 
-                //set the flash text
-                if (result == SelectActionResult.TOO_LONG)
-                    this._flashText.SetFlashText("The equation maximum is 15 numbers.", gameTime.TotalGameTime.TotalMilliseconds, true, true);
-                else if (result == SelectActionResult.ALREADY_SELECTED)
-                    this._flashText.SetFlashText("Number already selected.", gameTime.TotalGameTime.TotalMilliseconds, true, true);
-                else if (result == SelectActionResult.NOT_CONNECTED)
-                    this._flashText.SetFlashText("Numbers must be connected.", gameTime.TotalGameTime.TotalMilliseconds, true, true);
+                //if we have a real move
+                if (moveTypeCheck == MoveTypeCheck.REAL)
+                {
+
+                    //set the flash text
+                    if (result == SelectActionResult.TOO_LONG)
+                        this._flashText.SetFlashText("The equation maximum is 15 numbers.", gameTime.TotalGameTime.TotalMilliseconds, true, true);
+                    else if (result == SelectActionResult.ALREADY_SELECTED)
+                        this._flashText.SetFlashText("Number already selected.", gameTime.TotalGameTime.TotalMilliseconds, true, true);
+                    else if (result == SelectActionResult.NOT_CONNECTED)
+                        this._flashText.SetFlashText("Numbers must be connected.", gameTime.TotalGameTime.TotalMilliseconds, true, true);
+
+                }
 
             }
+
+            return null;
 
         }
 
@@ -779,13 +975,13 @@ namespace EquationFinder.Screens
                 row++;
                 col = 0;
                 position.X = x;
-                position.Y += 35;
+                position.Y += 31;
 
             }
 
         }
 
-        private bool IsValidOperationMove(GameTime gameTime)
+        private bool IsValidOperationMove(GameTime gameTime, MoveTypeCheck moveTypeCheck)
         {
 
             //Check to make sure this is a valid move
@@ -795,12 +991,12 @@ namespace EquationFinder.Screens
                 var undoType = _undoType[_undoType.Count() - 1];
                 if (undoType == "Number" || undoType == "Right Parenthesis")
                 {
-                    this.PlaySound(_correctSound, gameTime);
+                    this.PlaySound(_correctSound, gameTime, moveTypeCheck);
                     return true;
                 }
                 else
                 {
-                    this.PlaySound(_incorrectSound, gameTime);
+                    this.PlaySound(_incorrectSound, gameTime, moveTypeCheck);
                     return false;
                 }
 
@@ -808,14 +1004,14 @@ namespace EquationFinder.Screens
             else
             {
 
-                this.PlaySound(_incorrectSound, gameTime);
+                this.PlaySound(_incorrectSound, gameTime, moveTypeCheck);
                 return false;
 
             }
 
         }
 
-        private bool IsValidRightParenthesisMove(GameTime gameTime)
+        private bool IsValidRightParenthesisMove(GameTime gameTime, MoveTypeCheck moveTypeCheck)
         {
 
             //Check to make sure this is a valid move
@@ -826,12 +1022,12 @@ namespace EquationFinder.Screens
                 if (undoType == "Number"
                     || undoType == "Right Parenthesis")
                 {
-                    this.PlaySound(_correctSound, gameTime);
+                    this.PlaySound(_correctSound, gameTime, moveTypeCheck);
                     return true;
                 }
                 else
                 {
-                    this.PlaySound(_incorrectSound, gameTime);
+                    this.PlaySound(_incorrectSound, gameTime, moveTypeCheck);
                     return false;
                 }
 
@@ -839,14 +1035,14 @@ namespace EquationFinder.Screens
             else
             {
 
-                this.PlaySound(_incorrectSound, gameTime);
+                this.PlaySound(_incorrectSound, gameTime, moveTypeCheck);
                 return false;
 
             }
 
         }
 
-        private bool IsValidLeftParenthesisMove(GameTime gameTime)
+        private bool IsValidLeftParenthesisMove(GameTime gameTime, MoveTypeCheck moveTypeCheck)
         {
 
             //Check to make sure this is a valid move
@@ -857,12 +1053,12 @@ namespace EquationFinder.Screens
                 if (undoType == "Operation"
                     || undoType == "Left Parenthesis")
                 {
-                    this.PlaySound(_correctSound, gameTime);
+                    this.PlaySound(_correctSound, gameTime, moveTypeCheck);
                     return true;
                 }
                 else
                 {
-                    this.PlaySound(_incorrectSound, gameTime);
+                    this.PlaySound(_incorrectSound, gameTime, moveTypeCheck);
                     return false;
                 }
 
@@ -870,34 +1066,34 @@ namespace EquationFinder.Screens
             else
             {
 
-                this.PlaySound(_correctSound, gameTime);
+                this.PlaySound(_correctSound, gameTime, moveTypeCheck);
                 return true;
 
             }
 
         }
 
-        private SelectActionResult IsValidNumberMove(GameTime gameTime)
+        private SelectActionResult IsValidNumberMove(GameTime gameTime, MoveTypeCheck moveTypeCheck)
         {
 
 
             if (_selectedX < 0 && _selectedY < 0)
             {
-                this.PlaySound(_correctSound, gameTime);
+                this.PlaySound(_correctSound, gameTime, moveTypeCheck);
                 return SelectActionResult.SUCCESS;
             }
 
             if (!((Math.Abs(_selectedX - _currentX) <= 1) && (Math.Abs(_selectedY - _currentY) <= 1)))
             {
                 //play the bad sound
-                this.PlaySound(_incorrectSound, gameTime);
+                this.PlaySound(_incorrectSound, gameTime, moveTypeCheck);
                 return SelectActionResult.NOT_CONNECTED;
             }
 
 
             if (_undoType.Where(x => x == "Number").Count() >= 15)
             {
-                this.PlaySound(_incorrectSound, gameTime);
+                this.PlaySound(_incorrectSound, gameTime, moveTypeCheck);
                 return SelectActionResult.TOO_LONG;
             }
 
@@ -908,7 +1104,7 @@ namespace EquationFinder.Screens
                 var undoType = _undoType[_undoType.Count() - 1];
                 if (undoType == "Number" || undoType == "Right Parenthesis")
                 {
-                    this.PlaySound(_correctSound, gameTime);
+                    this.PlaySound(_correctSound, gameTime, moveTypeCheck);
                     return SelectActionResult.OPERATOR_FIRST;
                 }
 
@@ -919,7 +1115,7 @@ namespace EquationFinder.Screens
             if (_selectedY == _currentY && _selectedX == _currentX)
             {
                 //play the bad sound
-                this.PlaySound(_incorrectSound, gameTime);
+                this.PlaySound(_incorrectSound, gameTime, moveTypeCheck);
                 return SelectActionResult.ALREADY_SELECTED;
             }
             else
@@ -936,14 +1132,14 @@ namespace EquationFinder.Screens
                     if (_currentY == int.Parse(crumbs[0]) && _currentX == int.Parse(crumbs[1]))
                     {
                         //play the bad sound
-                        this.PlaySound(_incorrectSound, gameTime);
+                        this.PlaySound(_incorrectSound, gameTime, moveTypeCheck);
                         return SelectActionResult.ALREADY_SELECTED;
                     }
 
                 }
 
                 //play the good sound
-                this.PlaySound(_correctSound, gameTime);
+                this.PlaySound(_correctSound, gameTime, moveTypeCheck);
                 return SelectActionResult.SUCCESS;
             }
 
@@ -986,15 +1182,19 @@ namespace EquationFinder.Screens
 
         }
 
-        private void ResetBoardForNextLevel()
+        private void ResetBoardForNextLevel(GameTime gameTime)
         {
             this._currentEquation = "";
             this._selectedYXs.Clear();
             this._previouslySelectedYXs.Clear();
             this._selectedActionTypes.Clear();
+
+            //run the hud update
+            this.PopulateHudMoves(gameTime);
+
         }
 
-        private void HandleGameplayMove(GameTime gameTime, Move move)
+        private string HandleGameplayMove(GameTime gameTime, Move move, MoveTypeCheck moveTypeCheck)
         {
 
 
@@ -1015,49 +1215,56 @@ namespace EquationFinder.Screens
                 if (_undoEquations.Count() > 0)
                 {
 
-                    //get if we have an undo number
-                    var undoType = _undoType[_undoType.Count() - 1];
-
-                    //if we have a number to undo
-                    if (undoType == "Number")
+                    //if we have a real move
+                    if (moveTypeCheck == MoveTypeCheck.REAL)
                     {
 
-                        ////remove the most recent selected
-                        _selectedYXs.RemoveAt(_selectedYXs.Count() - 1);
+                        //get if we have an undo number
+                        var undoType = _undoType[_undoType.Count() - 1];
 
-                        if (_selectedYXs.Count() > 0)
+                        //if we have a number to undo
+                        if (undoType == "Number")
                         {
 
-                            var crumbs = _selectedYXs[_selectedYXs.Count() - 1].Split(new char[] { ',' });
-                            _selectedY = Convert.ToInt32(crumbs[0]);
-                            _selectedX = Convert.ToInt32(crumbs[1]);
+                            ////remove the most recent selected
+                            _selectedYXs.RemoveAt(_selectedYXs.Count() - 1);
 
+                            if (_selectedYXs.Count() > 0)
+                            {
+
+                                var crumbs = _selectedYXs[_selectedYXs.Count() - 1].Split(new char[] { ',' });
+                                _selectedY = Convert.ToInt32(crumbs[0]);
+                                _selectedX = Convert.ToInt32(crumbs[1]);
+
+
+                            }
+                            else
+                            {
+
+                                //update the selected values
+                                _selectedX = -1;
+                                _selectedY = -1;
+
+                            }
 
                         }
-                        else
-                        {
 
-                            //update the selected values
-                            _selectedX = -1;
-                            _selectedY = -1;
+                        //get the previous equation
+                        var previousEquation = _undoEquations[_undoEquations.Count() - 1];
 
-                        }
+                        //we used the previous equation so remove it
+                        _undoEquations.RemoveAt(_undoEquations.Count() - 1);
+                        _undoType.RemoveAt(_undoType.Count() - 1);
+                        _selectedActionTypes.RemoveAt(_selectedActionTypes.Count() - 1);
+
+                        //set the previous equation
+                        _currentEquation = previousEquation;
 
                     }
-
-                    //get the previous equation
-                    var previousEquation = _undoEquations[_undoEquations.Count() - 1];
-
-                    //we used the previous equation so remove it
-                    _undoEquations.RemoveAt(_undoEquations.Count() - 1);
-                    _undoType.RemoveAt(_undoType.Count() - 1);
-                    _selectedActionTypes.RemoveAt(_selectedActionTypes.Count() - 1);
-
-                    //set the previous equation
-                    _currentEquation = previousEquation;
-
-
-
+                    else if (moveTypeCheck == MoveTypeCheck.HUD)
+                    {
+                        return "Undo";
+                    }
 
                 }
 
@@ -1065,23 +1272,37 @@ namespace EquationFinder.Screens
             else if (move.Name == "Left Parenthesis")
             {
 
-                if (this.IsValidLeftParenthesisMove(gameTime))
+                //if we have a valid move
+                if (this.IsValidLeftParenthesisMove(gameTime, moveTypeCheck))
                 {
 
-                    //add the current equation to the list
-                    _undoEquations.Add(_currentEquation);
-                    _undoType.Add("Left Parenthesis");
-                    _selectedActionTypes.Add(ActionType.LEFT_PARENTHESIS);
+                    //if we are doing the move for real
+                    if (moveTypeCheck == MoveTypeCheck.REAL)
+                    {
 
-                    //update the equation
-                    _currentEquation += " (";
-                    _currentEquation = _currentEquation.Trim();
+                        //add the current equation to the list
+                        _undoEquations.Add(_currentEquation);
+                        _undoType.Add("Left Parenthesis");
+                        _selectedActionTypes.Add(ActionType.LEFT_PARENTHESIS);
+
+                        //update the equation
+                        _currentEquation += " (";
+                        _currentEquation = _currentEquation.Trim();
+
+                    }
+                    else if (moveTypeCheck == MoveTypeCheck.HUD)
+                    {
+
+                        return "(";
+
+                    }
 
                 }
                 else
                 {
-
-                    this._flashText.SetFlashText("Can't use left parenthesis now.", gameTime.TotalGameTime.TotalMilliseconds, true, true);
+                    //if we are doing the move for real, set the text
+                    if (moveTypeCheck == MoveTypeCheck.REAL)
+                        this._flashText.SetFlashText("Can't use left parenthesis now.", gameTime.TotalGameTime.TotalMilliseconds, true, true);
 
                 }
 
@@ -1089,47 +1310,66 @@ namespace EquationFinder.Screens
             else if (move.Name == "Right Parenthesis")
             {
 
-                if (this.IsValidRightParenthesisMove(gameTime))
+                //if we have a valid move
+                if (this.IsValidRightParenthesisMove(gameTime, moveTypeCheck))
                 {
 
-                    //add the current equation to the list
-                    _undoEquations.Add(_currentEquation);
-                    _undoType.Add("Right Parenthesis");
-                    _selectedActionTypes.Add(ActionType.RIGHT_PARENTHESIS);
+                    //if we are doing the move for real
+                    if (moveTypeCheck == MoveTypeCheck.REAL)
+                    {
 
-                    //update the equation
-                    _currentEquation += ")";
+                        //add the current equation to the list
+                        _undoEquations.Add(_currentEquation);
+                        _undoType.Add("Right Parenthesis");
+                        _selectedActionTypes.Add(ActionType.RIGHT_PARENTHESIS);
+
+                        //update the equation
+                        _currentEquation += ")";
+
+                    }
+                    else if (moveTypeCheck == MoveTypeCheck.HUD)
+                    {
+
+                        return ")";
+
+                    }
 
                 }
                 else
                 {
 
-                    this._flashText.SetFlashText("Can't use right parenthesis now.", gameTime.TotalGameTime.TotalMilliseconds, true, true);
+                    //if we are doing the move for real, set the text
+                    if (moveTypeCheck == MoveTypeCheck.REAL)
+                        this._flashText.SetFlashText("Can't use right parenthesis now.", gameTime.TotalGameTime.TotalMilliseconds, true, true);
 
                 }
 
             }
-
+            else if (move.Name == "Y")
+            {
+                _drawPreviousLines = !_drawPreviousLines;
+            }
             else if (move.Name == "A"
                 || move.Name == "B"
-                || move.Name == "X"
-                || move.Name == "Y")
+                || move.Name == "X")
             {
 
-                this.AddOperation(gameTime, move);
+                return this.AddOperation(gameTime, move, moveTypeCheck);
 
             }
             else if (move.Name == "Evaluate")
             {
 
                 //evaluate the equation
-                this.EvaulateEquation(gameTime);
+                this.EvaulateEquation(gameTime, MoveTypeCheck.REAL);
 
             }
 
+            return null;
+
         }
 
-        private void EvaulateEquation(GameTime gameTime)
+        private void EvaulateEquation(GameTime gameTime, MoveTypeCheck moveTypeCheck)
         {
 
             //if we don't have a current equation, select the current number
@@ -1148,7 +1388,6 @@ namespace EquationFinder.Screens
                 invalidEquation = true;
             }
 
-
             //if the equation has errors
             if (invalidEquation)
             {
@@ -1157,64 +1396,88 @@ namespace EquationFinder.Screens
                 _flashText.SetFlashText("Invalid equation", gameTime.TotalGameTime.TotalMilliseconds, true, true);
 
                 //play the bad sound
-                this.PlaySound(_incorrectSound, gameTime);
+                this.PlaySound(_incorrectSound, gameTime, moveTypeCheck);
 
             }
             else //if we don't have any errors
             {
 
                 //get the value of the actual expression entered
-                var actual = Convert.ToInt32(result);
-
-                //if they got it right
-                if (actual == _target)
+                var actual = 0;
+                if (int.TryParse(result.ToString(), out actual))
                 {
 
-                    //if they have used the equation previously
-                    if (UseEquationPreviously())
+                    //if it is an invalid actual
+                    if (actual == int.MinValue)
                     {
 
                         //set the flash text
-                        _flashText.SetFlashText("Already used that equation", gameTime.TotalGameTime.TotalMilliseconds, true, true);
+                        _flashText.SetFlashText("Invalid equation", gameTime.TotalGameTime.TotalMilliseconds, true, true);
 
                         //play the bad sound
-                        this.PlaySound(_incorrectSound, gameTime);
+                        this.PlaySound(_incorrectSound, gameTime, moveTypeCheck);
+
                     }
-                    else
+                    else if (actual == _target)  //if they got it right
                     {
 
-                        //add the correct path to the previously used paths
-                        this._previouslySelectedYXs.Add(new List<string>());
+                        //if they have used the equation previously
+                        if (UseEquationPreviously())
+                        {
 
-                        //add the YXs used in this equation
-                        foreach (var YX in _selectedYXs)
-                            this._previouslySelectedYXs[this._previouslySelectedYXs.Count - 1].Add(YX);
+                            //set the flash text
+                            _flashText.SetFlashText("Already used that equation", gameTime.TotalGameTime.TotalMilliseconds, true, true);
 
-                        //add time back to the clock
-                        _clock.AddTime(_secondForCorrectAnswer);
+                            //play the bad sound
+                            this.PlaySound(_incorrectSound, gameTime, moveTypeCheck);
+                        }
+                        else
+                        {
 
-                        //we got a correct answer, so we need to calculate the correct answer
-                        this.CalculateScore();
-                        this._totalCorrect++;
-                        this._roundCorrect++;
+                            //add the correct path to the previously used paths
+                            this._previouslySelectedYXs.Add(new List<string>());
+
+                            //add the YXs used in this equation
+                            foreach (var YX in _selectedYXs)
+                                this._previouslySelectedYXs[this._previouslySelectedYXs.Count - 1].Add(YX);
+
+                            //add time back to the clock
+                            _clock.AddTime(_secondForCorrectAnswer);
+
+                            //we got a correct answer, so we need to calculate the correct answer
+                            this.CalculateScore();
+                            this._totalCorrect++;
+                            this._roundCorrect++;
+
+                            //set the flash text
+                            _flashText.SetFlashText("Correct!", gameTime.TotalGameTime.TotalMilliseconds, true, false);
+
+                            //play the bad sound
+                            this.PlaySound(_correctSound, gameTime, moveTypeCheck);
+
+                        }
+
+                    }
+                    else //if they got it wrong 
+                    {
 
                         //set the flash text
-                        _flashText.SetFlashText("Correct!", gameTime.TotalGameTime.TotalMilliseconds, true, false);
+                        _flashText.SetFlashText(string.Format("Incorrect, result was {0}", actual), gameTime.TotalGameTime.TotalMilliseconds, true, true);
 
                         //play the bad sound
-                        this.PlaySound(_correctSound, gameTime);
+                        this.PlaySound(_incorrectSound, gameTime, moveTypeCheck);
 
                     }
 
                 }
-                else //if they got it wrong 
+                else
                 {
 
                     //set the flash text
-                    _flashText.SetFlashText(string.Format("Incorrect, result was {0}", actual), gameTime.TotalGameTime.TotalMilliseconds, true, true);
+                    _flashText.SetFlashText("Invalid equation", gameTime.TotalGameTime.TotalMilliseconds, true, true);
 
                     //play the bad sound
-                    this.PlaySound(_incorrectSound, gameTime);
+                    this.PlaySound(_incorrectSound, gameTime, moveTypeCheck);
 
                 }
 
@@ -1258,6 +1521,36 @@ namespace EquationFinder.Screens
                 MediaPlayer.Stop();
                 LoadingScreen.Load(ScreenManager, true, null, new MainMenuScreen());
 
+            }
+
+        }
+
+        private void PopulateHudMoves(GameTime gameTime)
+        {
+            //clear out the hud moves
+            _hudMoves.Clear();
+            _hudMovesDisplay = null;
+
+            _hudMoves.Add("A: ", HandleGameplayMove(gameTime, new Move("A", null), MoveTypeCheck.HUD) ?? "N/A");
+            _hudMoves.Add("LB: ", HandleGameplayMove(gameTime, new Move("Left Parenthesis", null), MoveTypeCheck.HUD) ?? "N/A");
+            _hudMoves.Add("RB: ", HandleGameplayMove(gameTime, new Move("Right Parenthesis", null), MoveTypeCheck.HUD) ?? "N/A");
+            _hudMoves.Add("LT: ", HandleGameplayMove(gameTime, new Move("Undo", null), MoveTypeCheck.HUD) ?? "N/A");
+            _hudMoves.Add("RT: ", "Eval");
+            _hudMoves.Add("Y: ", _drawPreviousLines == false ? "Show Lines" : "Hide Lines");
+
+        }
+
+        public string HudMovesDisplay 
+        {
+            get 
+            {
+                //if we don't have hub moves display
+                if (_hudMovesDisplay == null) 
+                {
+                    _hudMovesDisplay = string.Join(", ", _hudMoves.Select(x => x.Key + x.Value).ToArray());
+                }
+             
+                return _hudMovesDisplay;
             }
 
         }

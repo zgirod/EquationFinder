@@ -13,6 +13,7 @@ using Microsoft.Xna.Framework.Storage;
 using EquationFinder.Helpers;
 using EasyStorage;
 using System.IO;
+using EquationFinder.DomainLogic;
 
 namespace EquationFinder
 {
@@ -30,7 +31,6 @@ namespace EquationFinder
         private bool _asyncFinsihed;
         private bool _loadFinsihed;
         public static IAsyncSaveDevice _saveDevice;
-        public static bool IsTrailMode;
 
         public EquationFinderGame()
         {
@@ -86,9 +86,6 @@ namespace EquationFinder
             
             //load the loading screen
             LoadingScreen.Load(screenManager, true, null, null);
-
-            //set whether we are in a trail mode or not
-            EquationFinderGame.IsTrailMode = Guide.IsTrialMode;
 
             base.Initialize();
         }

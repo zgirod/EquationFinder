@@ -43,11 +43,6 @@ namespace EquationFinder.Screens
 				MenuEntries.Add(menuEntry);
 			}
 
-            //add the how it works option
-            menuEntry = new MenuEntry("F.A.Q", "FAQ");
-            menuEntry.Selected += MenuEntry_Selected;
-            MenuEntries.Add(menuEntry);
-
             //add the high scores option
             menuEntry = new MenuEntry("High Scores", "Scores");
             menuEntry.Selected += MenuEntry_Selected;

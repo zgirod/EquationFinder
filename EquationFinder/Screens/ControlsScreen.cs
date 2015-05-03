@@ -41,8 +41,8 @@ namespace EquationFinder.Screens
             KeyboardState = InputHelpers.GetKeyboardStateForAllPLayers();
 
             //get the direction
-            var direction = Direction.FromInput(GamePadState, KeyboardState);
-            if (Direction.FromInput(lastGamePadState, lastKeyboardState) != direction && direction != 0.0)
+            var direction = Direction.FromInput(GamePadState, KeyboardState, lastGamePadState);
+            if (Direction.FromInput(lastGamePadState, lastKeyboardState, lastGamePadState) != direction && direction != 0.0)
                 this.HandleDirection(direction);
 
             //call the base update
@@ -93,8 +93,8 @@ namespace EquationFinder.Screens
             _texture = _content.Load<Texture2D>("img/bg/Fibers");
             
             //load all the images 
-            _controls = new Texture2D[18];
-            for (int i = 0; i < 18; i++)
+            _controls = new Texture2D[19];
+            for (int i = 0; i < 19; i++)
                 _controls[i] = _content.Load<Texture2D>("img/howto/" + (i).ToString());
 
             // Load the score font

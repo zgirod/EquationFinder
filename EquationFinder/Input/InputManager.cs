@@ -118,8 +118,8 @@ namespace EquationFinder.Input
             bool mergeInput = (Buffer.Count > 0 && timeSinceLast < MergeInputTime);
 
             // If there is a new direction,
-            var direction = Direction.FromInput(GamePadState, KeyboardState);
-            if (Direction.FromInput(lastGamePadState, lastKeyboardState) != direction)
+            var direction = Direction.FromInput(GamePadState, KeyboardState, lastGamePadState);
+            if (Direction.FromInput(lastGamePadState, lastKeyboardState, lastGamePadState) != direction)
             {
 
                 // combine the direction with the buttons.

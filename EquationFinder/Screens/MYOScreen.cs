@@ -53,7 +53,7 @@ namespace EquationFinder.Screens
             KeyboardState = InputHelpers.GetKeyboardStateForAllPLayers();
 
             //get the direction
-            var direction = Direction.FromInput(GamePadState, KeyboardState);
+            var direction = Direction.FromInput(GamePadState, KeyboardState, lastGamePadState);
             if (direction != 0.0)
             {
 

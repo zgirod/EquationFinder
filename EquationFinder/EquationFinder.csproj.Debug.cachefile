@@ -23,6 +23,13 @@ Content\img\bg\Round_Dreams.xnb
 Content\img\bg\Smoke.xnb
 Content\img\bg\Wood.xnb
 Content\img\howto\0.xnb
+Content\img\howto\18.xnb
+Content\img\bg\Midnight_Black.xnb
+Content\img\bg\Cornflower_Blue.xnb
+Content\img\bg\Hulk_Green.xnb
+Content\img\bg\Joker_Purple.xnb
+Content\img\bg\Ghost_White.xnb
+Content\img\howto\17.xnb
 Content\gameFont.xnb
 Content\menufont.xnb
 Content\boardFont.xnb
@@ -31,7 +38,6 @@ Content\sound\incorrect.xnb
 Content\sound\BattleTheme.xnb
 Content\sound\DungeonTheme.xnb
 Content\sound\ForestTheme.xnb
-Content\img\howto\17.xnb
 Content\sound\BattleTheme.wma
 Content\sound\DungeonTheme.wma
 Content\sound\ForestTheme.wma

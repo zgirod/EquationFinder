@@ -139,7 +139,8 @@ namespace EquationFinder.Screens
             bool isSelected, 
             bool isPreviouslySelected,
             GameTime gameTime,
-            ColorPalette colorPalette)
+            ColorPalette colorPalette,
+            SpriteFont font)
         {
 
 
@@ -166,7 +167,7 @@ namespace EquationFinder.Screens
 
             Vector2 origin = new Vector2(0, screenManager.Font.LineSpacing / 2);
 
-            spriteBatch.DrawString(screenManager.Font, text, position, color, 0, origin, scale, SpriteEffects.None, 0);
+            spriteBatch.DrawString(font, text, position, color, 0, origin, scale, SpriteEffects.None, 0);
         }
 
 
@@ -185,6 +186,19 @@ namespace EquationFinder.Screens
         public virtual int GetWidth(GameplayScreen screen)
         {
             return (int)screen.ScreenManager.Font.MeasureString(Text).X;
+        }
+
+        public Vector2 GetCenter(GameplayScreen screen)
+        {
+
+            return new Vector2(
+                this.Position.X,
+                this.Position.Y);
+
+            //return new Vector2(
+            //    this.Position.X + (this.GetWidth(screen) / 2),
+            //    this.Position.Y + (this.GetHeight(screen) / 2));
+
         }
 
 

@@ -68,13 +68,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="boardFont.spritefont">
-      <Name>boardFont</Name>
-      <Importer>FontDescriptionImporter</Importer>
-      <Processor>FontDescriptionProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="sound\BattleTheme.wav">
       <Name>BattleTheme</Name>
       <Importer>WavImporter</Importer>
@@ -217,8 +210,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="img\howto\17.png">
-      <Name>17</Name>
+    <Compile Include="img\howto\18.png">
+      <Name>18</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
@@ -246,6 +239,20 @@
     </Compile>
     <Compile Include="img\bg\Ghost_White.png">
       <Name>Ghost_White</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="boardFont.spritefont">
+      <Name>boardFont</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="img\howto\17.png">
+      <Name>17</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

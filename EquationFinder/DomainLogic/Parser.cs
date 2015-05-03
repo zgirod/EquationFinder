@@ -15,16 +15,26 @@ namespace EquationFinder.DomainLogic
         public static decimal ParseEquation(string equation)
         {
 
-            //set the equation
-            equation = equation.Replace(" ", "").Trim();
+            try
+            {
+                //set the equation
+                equation = equation.Replace(" ", "").Trim();
 
-            //parse out the equation
-            equation = Parser.ProcessParenthesis(equation);
-            equation = Parser.ProcessMultiDivideOperators(Parser._firstOperators, equation);
-            equation = Parser.ProcessAdditionDivideOperators(Parser._secondOperators, equation);
+                //parse out the equation
+                equation = Parser.ProcessParenthesis(equation);
+                equation = Parser.ProcessMultiDivideOperators(Parser._firstOperators, equation);
+                equation = Parser.ProcessAdditionDivideOperators(Parser._secondOperators, equation);
 
-            //return the result
-            return Convert.ToDecimal(equation);
+                //return the result
+                return Convert.ToDecimal(equation);
+            }
+            catch
+            {
+
+                //if we have an error, just return int.MinValue
+                return Convert.ToDecimal(int.MinValue);
+
+            }
 
         }
 
